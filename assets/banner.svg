@@ -1,0 +1,241 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 1200 360" width="100%" height="100%">
+  <defs>
+    <!-- Background Gradient -->
+    <linearGradient id="bgGrad" x1="0%" y1="0%" x2="100%" y2="100%">
+      <stop offset="0%" stop-color="#0a101f" />
+      <stop offset="50%" stop-color="#060913" />
+      <stop offset="100%" stop-color="#03050a" />
+    </linearGradient>
+
+    <!-- Top Border Accent Gradient -->
+    <linearGradient id="borderGrad" x1="0%" y1="0%" x2="100%" y2="0%">
+      <stop offset="0%" stop-color="#38bdf8" stop-opacity="0.9" />
+      <stop offset="50%" stop-color="#2563eb" stop-opacity="0.7" />
+      <stop offset="100%" stop-color="#10b981" stop-opacity="0.3" />
+    </linearGradient>
+
+    <!-- Card Background Gradient -->
+    <linearGradient id="cardBg" x1="0%" y1="0%" x2="0%" y2="100%">
+      <stop offset="0%" stop-color="#0e172a" stop-opacity="0.85" />
+      <stop offset="100%" stop-color="#090d18" stop-opacity="0.95" />
+    </linearGradient>
+
+    <!-- Text Fill Gradient -->
+    <linearGradient id="textGrad" x1="0%" y1="0%" x2="100%" y2="0%">
+      <stop offset="0%" stop-color="#ffffff" />
+      <stop offset="100%" stop-color="#e2e8f0" />
+    </linearGradient>
+
+    <!-- Speed / Glow Gradients -->
+    <linearGradient id="cyanGrad" x1="0%" y1="0%" x2="100%" y2="0%">
+      <stop offset="0%" stop-color="#38bdf8" />
+      <stop offset="100%" stop-color="#0284c7" />
+    </linearGradient>
+
+    <linearGradient id="emeraldGrad" x1="0%" y1="0%" x2="100%" y2="0%">
+      <stop offset="0%" stop-color="#34d399" />
+      <stop offset="100%" stop-color="#059669" />
+    </linearGradient>
+
+    <linearGradient id="amberGrad" x1="0%" y1="0%" x2="100%" y2="0%">
+      <stop offset="0%" stop-color="#f87171" />
+      <stop offset="100%" stop-color="#ea580c" />
+    </linearGradient>
+
+    <!-- Filters -->
+    <filter id="glowCyan" x="-20%" y="-20%" width="140%" height="140%">
+      <feGaussianBlur stdDeviation="8" result="blur" />
+      <feComposite in="SourceGraphic" in2="blur" operator="over" />
+    </filter>
+
+    <filter id="glowEmerald" x="-20%" y="-20%" width="140%" height="140%">
+      <feGaussianBlur stdDeviation="6" result="blur" />
+      <feComposite in="SourceGraphic" in2="blur" operator="over" />
+    </filter>
+
+    <!-- Grid Pattern -->
+    <pattern id="cadGrid" width="36" height="36" patternUnits="userSpaceOnUse">
+      <path d="M 36 0 L 0 0 0 36" fill="none" stroke="#1e293b" stroke-width="0.75" stroke-opacity="0.3" />
+      <circle cx="0" cy="0" r="1" fill="#38bdf8" fill-opacity="0.2" />
+    </pattern>
+  </defs>
+
+  <!-- Background Base -->
+  <rect width="1200" height="360" rx="16" fill="url(#bgGrad)" />
+  <rect width="1200" height="360" rx="16" fill="url(#cadGrid)" />
+
+  <!-- Outer Border & Accent Line -->
+  <rect width="1200" height="360" rx="16" fill="none" stroke="rgba(255, 255, 255, 0.08)" stroke-width="1" />
+  <line x1="0" y1="0" x2="1200" y2="0" stroke="url(#borderGrad)" stroke-width="4" />
+
+  <!-- Ambient Light Halos -->
+  <circle cx="160" cy="180" r="140" fill="#2563eb" fill-opacity="0.1" filter="url(#glowCyan)" />
+  <circle cx="950" cy="180" r="160" fill="#10b981" fill-opacity="0.06" filter="url(#glowEmerald)" />
+
+  <!-- Corner Alignment Reticles -->
+  <path d="M 16 36 L 16 16 L 36 16 M 1184 16 L 1184 36 M 16 324 L 16 344 L 36 344 M 1184 344 L 1184 324" 
+        fill="none" stroke="#38bdf8" stroke-width="1.5" stroke-opacity="0.6" />
+
+  <!-- ========================================================================= -->
+  <!-- LEFT: HERO ICON BADGE (x=55, y=95)                                        -->
+  <!-- ========================================================================= -->
+  <g transform="translate(55, 95)">
+    <!-- Squircle Card Background -->
+    <rect width="170" height="170" rx="36" fill="#090e1a" stroke="url(#cyanGrad)" stroke-width="2" />
+    <rect x="8" y="8" width="154" height="154" rx="28" fill="#050811" stroke="rgba(56, 189, 248, 0.2)" stroke-width="1" />
+
+    <!-- Laptop Stylized Wireframe -->
+    <!-- Screen -->
+    <rect x="30" y="32" width="110" height="74" rx="6" fill="#0d1527" stroke="#38bdf8" stroke-width="1.5" />
+    <rect x="36" y="38" width="98" height="60" rx="3" fill="#030712" />
+
+    <!-- Terminal Line & Speed readout inside badge -->
+    <circle cx="42" cy="45" r="2" fill="#ef4444" />
+    <circle cx="48" cy="45" r="2" fill="#f59e0b" />
+    <circle cx="54" cy="45" r="2" fill="#10b981" />
+    
+    <text x="85" y="70" fill="#ffffff" font-family="'JetBrains Mono', Consolas, monospace" font-size="17" font-weight="800" text-anchor="middle">
+      164.2
+    </text>
+    <text x="85" y="84" fill="#10b981" font-family="'JetBrains Mono', Consolas, monospace" font-size="9" font-weight="700" text-anchor="middle">
+      tok/s REAL
+    </text>
+
+    <!-- Laptop Base -->
+    <path d="M 22 108 L 148 108 L 156 120 L 14 120 Z" fill="#1e293b" stroke="#38bdf8" stroke-width="1.2" />
+    <line x1="72" y1="112" x2="98" y2="112" stroke="#64748b" stroke-width="1.5" stroke-linecap="round" />
+
+    <!-- Bottom Checkmark Pill inside icon -->
+    <g transform="translate(26, 134)">
+      <rect width="118" height="20" rx="4" fill="#064e3b" stroke="#10b981" stroke-width="1" />
+      <path d="M 12 10 L 16 14 L 24 6" fill="none" stroke="#34d399" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" />
+      <text x="32" y="14" fill="#ecfdf5" font-family="'JetBrains Mono', Consolas, monospace" font-size="8" font-weight="700">
+        PHYSICALLY VALID
+      </text>
+    </g>
+  </g>
+
+  <!-- ========================================================================= -->
+  <!-- CENTER: TITLE & REASON TO BELIEVE (x=260..710)                            -->
+  <!-- ========================================================================= -->
+  <g transform="translate(260, 72)">
+    <!-- Top Category Kicker -->
+    <text x="0" y="16" fill="#38bdf8" font-family="'JetBrains Mono', Consolas, monospace" font-size="12" font-weight="700" letter-spacing="2">
+      // VERIFIED COMMUNITY BENCHMARK DATABASE
+    </text>
+
+    <!-- Main Title -->
+    <text x="0" y="60" fill="url(#textGrad)" font-family="'Inter', -apple-system, 'Segoe UI', sans-serif" font-size="46" font-weight="800" letter-spacing="-1">
+      RunsOnMine
+    </text>
+
+    <!-- Core Value Statement -->
+    <text x="0" y="92" fill="#38bdf8" font-family="'JetBrains Mono', Consolas, monospace" font-size="16" font-weight="700">
+      Measured local AI speeds on real computers.
+    </text>
+
+    <text x="0" y="120" fill="#94a3b8" font-family="'Inter', -apple-system, 'Segoe UI', sans-serif" font-size="13.5" font-weight="400">
+      Zero guesswork calculators. Real token/s, TTFT, and thermal throttling
+    </text>
+    <text x="0" y="140" fill="#94a3b8" font-family="'Inter', -apple-system, 'Segoe UI', sans-serif" font-size="13.5" font-weight="400">
+      collected directly from community laptops, desktops, and Macs.
+    </text>
+
+    <!-- Interactive Terminal Command Pill -->
+    <g transform="translate(0, 166)">
+      <rect width="430" height="38" rx="6" fill="#090e1a" stroke="#1e293b" stroke-width="1" />
+      
+      <!-- Terminal prompt symbol -->
+      <text x="14" y="24" fill="#10b981" font-family="'JetBrains Mono', Consolas, monospace" font-size="13" font-weight="700">$</text>
+      <text x="30" y="24" fill="#f1f5f9" font-family="'JetBrains Mono', Consolas, monospace" font-size="12" font-weight="600">
+        uvx servebench submit <tspan fill="#38bdf8">--model qwen2.5:0.5b</tspan>
+      </text>
+
+      <!-- 2-min test badge -->
+      <rect x="350" y="8" width="68" height="22" rx="4" fill="#1e1b4b" stroke="#8b5cf6" stroke-width="1" />
+      <text x="384" y="22" fill="#c4b5fd" font-family="'JetBrains Mono', Consolas, monospace" font-size="9" font-weight="700" text-anchor="middle">
+        ~2 MIN
+      </text>
+    </g>
+  </g>
+
+  <!-- ========================================================================= -->
+  <!-- RIGHT: THE REALITY CHECK CARD (x=730..1145, y=56..304)                    -->
+  <!-- ========================================================================= -->
+  <g transform="translate(730, 56)">
+    <!-- Card Frame -->
+    <rect width="415" height="248" rx="10" fill="url(#cardBg)" stroke="rgba(56, 189, 248, 0.25)" stroke-width="1.2" />
+
+    <!-- Card Header -->
+    <rect x="0" y="0" width="415" height="34" rx="10" fill="#0f172a" fill-opacity="0.8" />
+    <circle cx="16" cy="17" r="4" fill="#38bdf8" filter="url(#glowCyan)" />
+    <text x="28" y="21" fill="#f8fafc" font-family="'JetBrains Mono', Consolas, monospace" font-size="11" font-weight="700" letter-spacing="1">
+      WHY MEASURED: RTX 3050 LAPTOP
+    </text>
+    <text x="400" y="21" fill="#64748b" font-family="'JetBrains Mono', Consolas, monospace" font-size="9" text-anchor="end">
+      REAL VS ESTIMATE
+    </text>
+
+    <!-- Comparison Chart Container -->
+    <g transform="translate(18, 48)">
+      <!-- Row 1: Theoretical Calculator Estimate -->
+      <text x="0" y="12" fill="#94a3b8" font-family="'JetBrains Mono', Consolas, monospace" font-size="10">
+        THEORETICAL ROOFLINE ESTIMATE:
+      </text>
+      <text x="380" y="12" fill="#f87171" font-family="'JetBrains Mono', Consolas, monospace" font-size="11" font-weight="700" text-anchor="end">
+        444 tok/s
+      </text>
+
+      <rect x="0" y="20" width="380" height="14" rx="3" fill="#1e293b" />
+      <rect x="0" y="20" width="380" height="14" rx="3" fill="url(#amberGrad)" opacity="0.85" />
+      <text x="10" y="31" fill="#ffffff" font-family="'JetBrains Mono', Consolas, monospace" font-size="8" font-weight="700">
+        MISSES ENGINE OVERHEAD &amp; REAL MEMORY CLOCKS
+      </text>
+
+      <!-- Row 2: Real Ollama Measured Speed -->
+      <text x="0" y="58" fill="#94a3b8" font-family="'JetBrains Mono', Consolas, monospace" font-size="10">
+        RUNSONMINE MEASURED (OLLAMA):
+      </text>
+      <text x="380" y="58" fill="#34d399" font-family="'JetBrains Mono', Consolas, monospace" font-size="12" font-weight="800" text-anchor="end">
+        164 tok/s
+      </text>
+
+      <rect x="0" y="66" width="380" height="18" rx="3" fill="#1e293b" />
+      <!-- 164 / 444 * 380 ≈ 140 width -->
+      <rect x="0" y="66" width="140" height="18" rx="3" fill="url(#emeraldGrad)" filter="url(#glowEmerald)" />
+      <text x="10" y="79" fill="#022c22" font-family="'JetBrains Mono', Consolas, monospace" font-size="9" font-weight="800">
+        REAL SPEED
+      </text>
+
+      <!-- Discrepancy Annotation Callout -->
+      <g transform="translate(0, 96)">
+        <rect width="380" height="28" rx="4" fill="#0a101f" stroke="#334155" stroke-width="1" />
+        <text x="12" y="18" fill="#fbbf24" font-family="'JetBrains Mono', Consolas, monospace" font-size="9" font-weight="700">
+          ▲ 280 tok/s GAP: <tspan fill="#cbd5e1" font-weight="400">calculators mislead, hardware measurements don't.</tspan>
+        </text>
+      </g>
+
+      <!-- Hardware Tags Matrix -->
+      <g transform="translate(0, 136)">
+        <text x="0" y="10" fill="#64748b" font-family="'JetBrains Mono', Consolas, monospace" font-size="8.5" font-weight="700">
+          CI-CHECKED HARDWARE SUBMISSIONS:
+        </text>
+
+        <!-- Tags -->
+        <g transform="translate(0, 18)">
+          <rect x="0" y="0" width="85" height="18" rx="3" fill="#082f49" stroke="#0ea5e9" stroke-width="1" />
+          <text x="42" y="12" fill="#7dd3fc" font-family="'JetBrains Mono', Consolas, monospace" font-size="8" font-weight="700" text-anchor="middle">Apple Silicon</text>
+
+          <rect x="92" y="0" width="85" height="18" rx="3" fill="#064e3b" stroke="#10b981" stroke-width="1" />
+          <text x="134" y="12" fill="#6ee7b7" font-family="'JetBrains Mono', Consolas, monospace" font-size="8" font-weight="700" text-anchor="middle">NVIDIA RTX</text>
+
+          <rect x="184" y="0" width="90" height="18" rx="3" fill="#1e1b4b" stroke="#8b5cf6" stroke-width="1" />
+          <text x="229" y="12" fill="#c4b5fd" font-family="'JetBrains Mono', Consolas, monospace" font-size="8" font-weight="700" text-anchor="middle">Kaggle T4/P100</text>
+
+          <rect x="281" y="0" width="99" height="18" rx="3" fill="#451a03" stroke="#f59e0b" stroke-width="1" />
+          <text x="330" y="12" fill="#fde68a" font-family="'JetBrains Mono', Consolas, monospace" font-size="8" font-weight="700" text-anchor="middle">AMD / Intel iGPU</text>
+        </g>
+      </g>
+    </g>
+  </g>
+</svg>

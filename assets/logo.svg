@@ -1,0 +1,196 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 512 512" width="100%" height="100%">
+  <defs>
+    <!-- Background Obsidian Gradient -->
+    <linearGradient id="bgGrad" x1="0%" y1="0%" x2="100%" y2="100%">
+      <stop offset="0%" stop-color="#0a101f" />
+      <stop offset="50%" stop-color="#060913" />
+      <stop offset="100%" stop-color="#03050a" />
+    </linearGradient>
+
+    <!-- Border Gradient -->
+    <linearGradient id="borderGrad" x1="0%" y1="0%" x2="100%" y2="100%">
+      <stop offset="0%" stop-color="#38bdf8" stop-opacity="0.9" />
+      <stop offset="50%" stop-color="#2563eb" stop-opacity="0.6" />
+      <stop offset="100%" stop-color="#10b981" stop-opacity="0.3" />
+    </linearGradient>
+
+    <!-- Screen Bezel Gradient -->
+    <linearGradient id="screenBezel" x1="0%" y1="0%" x2="100%" y2="100%">
+      <stop offset="0%" stop-color="#1e293b" />
+      <stop offset="100%" stop-color="#0f172a" />
+    </linearGradient>
+
+    <!-- Screen Display Gradient -->
+    <linearGradient id="screenDisplay" x1="0%" y1="0%" x2="0%" y2="100%">
+      <stop offset="0%" stop-color="#030712" />
+      <stop offset="100%" stop-color="#0b1329" />
+    </linearGradient>
+
+    <!-- Chasis Base Gradient -->
+    <linearGradient id="chassisGrad" x1="0%" y1="0%" x2="100%" y2="0%">
+      <stop offset="0%" stop-color="#1e293b" />
+      <stop offset="50%" stop-color="#334155" />
+      <stop offset="100%" stop-color="#1e293b" />
+    </linearGradient>
+
+    <!-- Speed Cyan/Mint Gradient -->
+    <linearGradient id="speedGrad" x1="0%" y1="0%" x2="100%" y2="0%">
+      <stop offset="0%" stop-color="#38bdf8" />
+      <stop offset="100%" stop-color="#10b981" />
+    </linearGradient>
+
+    <!-- Neon Glow Filter -->
+    <filter id="glow" x="-20%" y="-20%" width="140%" height="140%">
+      <feGaussianBlur stdDeviation="8" result="blur" />
+      <feComposite in="SourceGraphic" in2="blur" operator="over" />
+    </filter>
+
+    <filter id="subtleGlow" x="-20%" y="-20%" width="140%" height="140%">
+      <feGaussianBlur stdDeviation="3" result="blur" />
+      <feComposite in="SourceGraphic" in2="blur" operator="over" />
+    </filter>
+
+    <!-- Circuit Trace Grid -->
+    <pattern id="pcbGrid" width="32" height="32" patternUnits="userSpaceOnUse">
+      <path d="M 32 0 L 0 0 0 32" fill="none" stroke="#1e293b" stroke-width="0.75" stroke-opacity="0.3" />
+      <circle cx="0" cy="0" r="1.2" fill="#38bdf8" fill-opacity="0.25" />
+    </pattern>
+  </defs>
+
+  <!-- Background Squircle Frame -->
+  <rect x="16" y="16" width="480" height="480" rx="112" fill="url(#bgGrad)" stroke="url(#borderGrad)" stroke-width="3.5" />
+  <rect x="16" y="16" width="480" height="480" rx="112" fill="url(#pcbGrid)" />
+
+  <!-- Ambient Light Backdrops -->
+  <circle cx="256" cy="220" r="140" fill="#2563eb" fill-opacity="0.12" filter="url(#glow)" />
+  <circle cx="256" cy="240" r="80" fill="#10b981" fill-opacity="0.08" filter="url(#glow)" />
+
+  <!-- PCB Hardware Trace Lines around Machine -->
+  <g opacity="0.35" stroke="#38bdf8" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round">
+    <!-- Top left bus -->
+    <path d="M 64 120 L 110 120 L 140 150" fill="none" />
+    <circle cx="64" cy="120" r="3" fill="#38bdf8" />
+
+    <!-- Top right bus -->
+    <path d="M 448 120 L 402 120 L 372 150" fill="none" />
+    <circle cx="448" cy="120" r="3" fill="#38bdf8" />
+
+    <!-- Bottom left trace -->
+    <path d="M 70 380 L 120 380 L 150 350" fill="none" />
+    <circle cx="70" cy="380" r="3" fill="#38bdf8" />
+
+    <!-- Bottom right trace -->
+    <path d="M 442 380 L 392 380 L 362 350" fill="none" />
+    <circle cx="442" cy="380" r="3" fill="#38bdf8" />
+  </g>
+
+  <!-- ========================================================================= -->
+  <!-- CENTRAL MACHINE CHASSIS & SCREEN                                          -->
+  <!-- ========================================================================= -->
+
+  <!-- Screen Lid / Display Housing -->
+  <g id="screenGroup">
+    <!-- Outer Lid Frame -->
+    <rect x="106" y="100" width="300" height="200" rx="18" fill="url(#screenBezel)" stroke="#38bdf8" stroke-width="2" stroke-opacity="0.7" />
+
+    <!-- Webcam / Ambient Sensor Dot -->
+    <circle cx="256" cy="111" r="2.5" fill="#475569" />
+
+    <!-- Display Glass -->
+    <rect x="120" y="122" width="272" height="164" rx="10" fill="url(#screenDisplay)" stroke="#1e293b" stroke-width="1" />
+
+    <!-- Inside Screen: Live Benchmark Telemetry -->
+    <!-- Window Title Bar -->
+    <path d="M 120 132 C 120 126, 126 122, 132 122 L 380 122 C 386 122, 392 126, 392 132 L 392 142 L 120 142 Z" fill="#0f172a" />
+    <circle cx="132" cy="132" r="3" fill="#ef4444" />
+    <circle cx="142" cy="132" r="3" fill="#f59e0b" />
+    <circle cx="152" cy="132" r="3" fill="#10b981" />
+    <text x="256" y="135" fill="#64748b" font-family="'JetBrains Mono', Consolas, monospace" font-size="8" font-weight="600" text-anchor="middle">
+      runsonmine // submit
+    </text>
+
+    <!-- Model & Target Info -->
+    <text x="134" y="160" fill="#94a3b8" font-family="'JetBrains Mono', Consolas, monospace" font-size="9">
+      MODEL: <tspan fill="#f1f5f9" font-weight="700">qwen2.5:0.5b</tspan>
+    </text>
+    <text x="134" y="174" fill="#64748b" font-family="'JetBrains Mono', Consolas, monospace" font-size="8">
+      TARGET: <tspan fill="#38bdf8">NVIDIA RTX 3050 (AC)</tspan>
+    </text>
+
+    <!-- Measured Speed Readout (Big Hero Metric) -->
+    <text x="134" y="214" fill="#ffffff" font-family="'JetBrains Mono', Consolas, monospace" font-size="34" font-weight="800" letter-spacing="-1">
+      164.2
+    </text>
+    <text x="246" y="210" fill="#10b981" font-family="'JetBrains Mono', Consolas, monospace" font-size="14" font-weight="800">
+      tok/s
+    </text>
+
+    <!-- Sparkline / Waveform of Token Generation -->
+    <path d="M 134 238 L 160 234 L 180 236 L 205 231 L 230 235 L 255 229 L 280 232 L 310 228 L 335 233 L 360 229 L 378 230" 
+          fill="none" stroke="url(#speedGrad)" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" filter="url(#subtleGlow)" />
+    
+    <!-- Pulse Dot at head of wave -->
+    <circle cx="378" cy="230" r="3" fill="#10b981" filter="url(#glow)" />
+
+    <!-- Status Badges inside Screen -->
+    <g transform="translate(134, 250)">
+      <!-- Verified Badge -->
+      <rect width="112" height="18" rx="4" fill="#064e3b" stroke="#10b981" stroke-width="1" />
+      <circle cx="8" cy="9" r="2.5" fill="#34d399" />
+      <text x="16" y="12" fill="#ecfdf5" font-family="'JetBrains Mono', Consolas, monospace" font-size="7.5" font-weight="700">
+        PHYSICALLY VALID
+      </text>
+
+      <!-- Real Not Estimate Badge -->
+      <g transform="translate(120, 0)">
+        <rect width="124" height="18" rx="4" fill="#1e1b4b" stroke="#8b5cf6" stroke-width="1" />
+        <circle cx="8" cy="9" r="2.5" fill="#c4b5fd" />
+        <text x="16" y="12" fill="#f5f3ff" font-family="'JetBrains Mono', Consolas, monospace" font-size="7.5" font-weight="700">
+          REAL RUN (NOT EST)
+        </text>
+      </g>
+    </g>
+  </g>
+
+  <!-- Laptop Keyboard Base & Hinge -->
+  <g id="baseGroup">
+    <!-- Hinge Bar -->
+    <rect x="180" y="298" width="152" height="6" rx="2" fill="#334155" stroke="#1e293b" stroke-width="1" />
+
+    <!-- Bottom Chassis Wedge -->
+    <path d="M 80 304 L 432 304 L 452 328 C 452 332, 448 334, 442 334 L 70 334 C 64 334, 60 332, 60 328 Z" 
+          fill="url(#chassisGrad)" stroke="#38bdf8" stroke-width="1.8" stroke-opacity="0.8" />
+
+    <!-- Keyboard Inset Deck -->
+    <path d="M 120 308 L 392 308 L 406 322 L 106 322 Z" fill="#0f172a" stroke="#1e293b" stroke-width="1" />
+
+    <!-- Trackpad Outline & Finger Notch -->
+    <rect x="226" y="325" width="60" height="7" rx="2" fill="#1e293b" />
+    <path d="M 236 334 L 276 334" stroke="#38bdf8" stroke-width="1.5" stroke-linecap="round" />
+  </g>
+
+  <!-- Dynamic Underglow Projection from Chassis -->
+  <ellipse cx="256" cy="336" rx="140" ry="12" fill="#38bdf8" fill-opacity="0.18" filter="url(#glow)" />
+
+  <!-- ========================================================================= -->
+  <!-- BOTTOM PROJECT BRANDING TEXT                                              -->
+  <!-- ========================================================================= -->
+  <g transform="translate(256, 400)">
+    <!-- Title -->
+    <text x="0" y="0" fill="#ffffff" font-family="'JetBrains Mono', Consolas, monospace" font-size="28" font-weight="800" text-anchor="middle" letter-spacing="3">
+      RUNSONMINE
+    </text>
+    <!-- Subtitle -->
+    <text x="0" y="22" fill="#38bdf8" font-family="'JetBrains Mono', Consolas, monospace" font-size="11" font-weight="700" text-anchor="middle" letter-spacing="2">
+      MEASURED LOCAL LLM BENCHMARKS
+    </text>
+  </g>
+
+  <!-- Corner Silicon Alignment Markers -->
+  <g stroke="#38bdf8" stroke-width="1.5" opacity="0.6">
+    <path d="M 32 50 L 32 32 L 50 32" fill="none" />
+    <path d="M 480 50 L 480 32 L 462 32" fill="none" />
+    <path d="M 32 462 L 32 480 L 50 480" fill="none" />
+    <path d="M 480 462 L 480 480 L 462 480" fill="none" />
+  </g>
+</svg>

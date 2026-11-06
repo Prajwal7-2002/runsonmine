@@ -1,0 +1,402 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 1500 500" width="1500" height="500">
+  <defs>
+    <!-- Background Gradient -->
+    <linearGradient id="bgCanvas" x1="0%" y1="0%" x2="100%" y2="100%">
+      <stop offset="0%" stop-color="#0a101f" />
+      <stop offset="50%" stop-color="#060913" />
+      <stop offset="100%" stop-color="#03050a" />
+    </linearGradient>
+
+    <!-- Card Background Gradient -->
+    <linearGradient id="cardBg" x1="0%" y1="0%" x2="0%" y2="100%">
+      <stop offset="0%" stop-color="#0e172a" stop-opacity="0.85" />
+      <stop offset="100%" stop-color="#090d18" stop-opacity="0.95" />
+    </linearGradient>
+
+    <!-- Glowing Accent Gradients -->
+    <linearGradient id="cyanGrad" x1="0%" y1="0%" x2="100%" y2="0%">
+      <stop offset="0%" stop-color="#38bdf8" />
+      <stop offset="100%" stop-color="#0284c7" />
+    </linearGradient>
+
+    <linearGradient id="emeraldGrad" x1="0%" y1="0%" x2="100%" y2="0%">
+      <stop offset="0%" stop-color="#34d399" />
+      <stop offset="100%" stop-color="#059669" />
+    </linearGradient>
+
+    <linearGradient id="amberGrad" x1="0%" y1="0%" x2="100%" y2="0%">
+      <stop offset="0%" stop-color="#f87171" />
+      <stop offset="100%" stop-color="#ea580c" />
+    </linearGradient>
+
+    <linearGradient id="cardBorderCyan" x1="0%" y1="0%" x2="100%" y2="100%">
+      <stop offset="0%" stop-color="#38bdf8" stop-opacity="0.4" />
+      <stop offset="50%" stop-color="#1e293b" stop-opacity="0.2" />
+      <stop offset="100%" stop-color="#38bdf8" stop-opacity="0.1" />
+    </linearGradient>
+
+    <linearGradient id="cardBorderEmerald" x1="0%" y1="0%" x2="100%" y2="100%">
+      <stop offset="0%" stop-color="#10b981" stop-opacity="0.4" />
+      <stop offset="50%" stop-color="#1e293b" stop-opacity="0.2" />
+      <stop offset="100%" stop-color="#10b981" stop-opacity="0.1" />
+    </linearGradient>
+
+    <!-- Filters -->
+    <filter id="glowCyan" x="-20%" y="-20%" width="140%" height="140%">
+      <feGaussianBlur stdDeviation="4" result="blur" />
+      <feComposite in="SourceGraphic" in2="blur" operator="over" />
+    </filter>
+
+    <filter id="glowEmerald" x="-20%" y="-20%" width="140%" height="140%">
+      <feGaussianBlur stdDeviation="4" result="blur" />
+      <feComposite in="SourceGraphic" in2="blur" operator="over" />
+    </filter>
+
+    <!-- CAD Grid Pattern -->
+    <pattern id="cadGrid" width="40" height="40" patternUnits="userSpaceOnUse">
+      <path d="M 40 0 L 0 0 0 40" fill="none" stroke="#1e293b" stroke-width="0.75" stroke-opacity="0.35" />
+      <circle cx="0" cy="0" r="1" fill="#38bdf8" fill-opacity="0.25" />
+    </pattern>
+
+    <pattern id="dotSubgrid" width="10" height="10" patternUnits="userSpaceOnUse">
+      <circle cx="5" cy="5" r="0.6" fill="#334155" fill-opacity="0.2" />
+    </pattern>
+  </defs>
+
+  <!-- Background Base Layer -->
+  <rect width="1500" height="500" fill="url(#bgCanvas)" />
+  <rect width="1500" height="500" fill="url(#dotSubgrid)" />
+  <rect width="1500" height="500" fill="url(#cadGrid)" />
+
+  <!-- Ambient Glow Cones -->
+  <circle cx="200" cy="80" r="280" fill="#0284c7" fill-opacity="0.08" filter="url(#glowCyan)" />
+  <circle cx="800" cy="220" r="320" fill="#10b981" fill-opacity="0.06" filter="url(#glowEmerald)" />
+  <circle cx="1300" cy="380" r="260" fill="#2563eb" fill-opacity="0.06" filter="url(#glowCyan)" />
+
+  <!-- Outer Viewport Framing & Corner Reticles -->
+  <rect x="12" y="12" width="1476" height="476" rx="8" fill="none" stroke="#334155" stroke-width="1" stroke-opacity="0.4" />
+  <path d="M 12 32 L 12 12 L 32 12 M 1468 12 L 1488 12 L 1488 32 M 12 468 L 12 488 L 32 488 M 1488 468 L 1488 488 L 1468 488" 
+        fill="none" stroke="#38bdf8" stroke-width="2" stroke-opacity="0.8" />
+
+  <!-- ========================================================================= -->
+  <!-- TOP TELEMETRY STRIP (x=40..1460, y=26)                                     -->
+  <!-- ========================================================================= -->
+  <g transform="translate(40, 26)">
+    <!-- Engine Status Pill -->
+    <circle cx="6" cy="4" r="3.5" fill="#10b981" filter="url(#glowEmerald)" />
+    <text x="18" y="8" fill="#10b981" font-family="'JetBrains Mono', Consolas, monospace" font-size="11" font-weight="700" letter-spacing="1.5">OPEN_BENCHMARK</text>
+    <text x="145" y="8" fill="#475569" font-family="'JetBrains Mono', Consolas, monospace" font-size="11">|</text>
+    <text x="160" y="8" fill="#94a3b8" font-family="'JetBrains Mono', Consolas, monospace" font-size="11">HARNESS: <tspan fill="#f1f5f9" font-weight="600">uvx servebench submit</tspan></text>
+    <text x="440" y="8" fill="#475569" font-family="'JetBrains Mono', Consolas, monospace" font-size="11">|</text>
+    <text x="455" y="8" fill="#94a3b8" font-family="'JetBrains Mono', Consolas, monospace" font-size="11">DATA: <tspan fill="#38bdf8" font-weight="600">CC BY 4.0 (OPEN HARDWARE REPO)</tspan></text>
+    <text x="800" y="8" fill="#475569" font-family="'JetBrains Mono', Consolas, monospace" font-size="11">|</text>
+    <text x="815" y="8" fill="#94a3b8" font-family="'JetBrains Mono', Consolas, monospace" font-size="11">CI_GATE: <tspan fill="#34d399" font-weight="600">PHYSICAL VALIDITY ENFORCED</tspan></text>
+
+    <!-- Right-aligned Target Stats -->
+    <text x="1420" y="8" fill="#cbd5e1" font-family="'JetBrains Mono', Consolas, monospace" font-size="11" text-anchor="end">
+      TARGETS: <tspan fill="#38bdf8" font-weight="700">MAC</tspan> • <tspan fill="#10b981" font-weight="700">WINDOWS</tspan> • <tspan fill="#fbbf24" font-weight="700">LINUX</tspan> • <tspan fill="#a78bfa" font-weight="700">KAGGLE T4</tspan>
+    </text>
+  </g>
+
+  <!-- Divider Line -->
+  <line x1="40" y1="42" x2="1460" y2="42" stroke="#1e293b" stroke-width="1" />
+
+  <!-- ========================================================================= -->
+  <!-- ZONE 1: LEFT IDENTITY & CORE VALUE (x=50..530)                            -->
+  <!-- ========================================================================= -->
+  <g transform="translate(50, 62)">
+    <!-- Small Category Kicker -->
+    <text x="0" y="16" fill="#38bdf8" font-family="'JetBrains Mono', Consolas, monospace" font-size="12" font-weight="700" letter-spacing="2.5">
+      // CROWDSOURCED REAL-WORLD AI HARDWARE SPEEDS
+    </text>
+
+    <!-- Main Title Header -->
+    <text x="0" y="58" fill="#ffffff" font-family="'Inter', -apple-system, 'Segoe UI', sans-serif" font-size="44" font-weight="800" letter-spacing="-1">
+      RunsOnMine
+    </text>
+
+    <!-- Core Subhead -->
+    <text x="0" y="86" fill="#38bdf8" font-family="'JetBrains Mono', Consolas, monospace" font-size="16" font-weight="700" letter-spacing="1">
+      MEASURED SPEEDS, NOT ESTIMATES.
+    </text>
+
+    <!-- Concise Mission -->
+    <text x="0" y="114" fill="#94a3b8" font-family="'Inter', -apple-system, 'Segoe UI', sans-serif" font-size="13" font-weight="400">
+      See what runs on your Mac, laptop, or desktop before downloading.
+    </text>
+    <text x="0" y="132" fill="#94a3b8" font-family="'Inter', -apple-system, 'Segoe UI', sans-serif" font-size="13" font-weight="400">
+      Tested on real hardware with engine overhead and thermal throttles.
+    </text>
+
+    <!-- System Repo Hardware Badges -->
+    <g transform="translate(0, 150)">
+      <!-- Apple Silicon badge -->
+      <g transform="translate(0, 0)">
+        <rect width="115" height="26" rx="5" fill="#082f49" stroke="#0ea5e9" stroke-width="1.2" />
+        <circle cx="12" cy="13" r="3.5" fill="#38bdf8" />
+        <text x="24" y="17" fill="#f0f9ff" font-family="'JetBrains Mono', Consolas, monospace" font-size="10.5" font-weight="700">Apple Silicon</text>
+      </g>
+
+      <!-- NVIDIA RTX badge -->
+      <g transform="translate(122, 0)">
+        <rect width="112" height="26" rx="5" fill="#064e3b" stroke="#10b981" stroke-width="1.2" />
+        <circle cx="12" cy="13" r="3.5" fill="#34d399" />
+        <text x="24" y="17" fill="#ecfdf5" font-family="'JetBrains Mono', Consolas, monospace" font-size="10.5" font-weight="700">NVIDIA RTX</text>
+      </g>
+
+      <!-- Kaggle T4 badge -->
+      <g transform="translate(240, 0)">
+        <rect width="112" height="26" rx="5" fill="#1e1b4b" stroke="#8b5cf6" stroke-width="1.2" />
+        <circle cx="12" cy="13" r="3.5" fill="#a78bfa" />
+        <text x="24" y="17" fill="#f5f3ff" font-family="'JetBrains Mono', Consolas, monospace" font-size="10.5" font-weight="700">Kaggle T4</text>
+      </g>
+
+      <!-- AMD/Intel badge -->
+      <g transform="translate(358, 0)">
+        <rect width="116" height="26" rx="5" fill="#451a03" stroke="#f59e0b" stroke-width="1.2" />
+        <circle cx="12" cy="13" r="3.5" fill="#fbbf24" />
+        <text x="24" y="17" fill="#fffbeb" font-family="'JetBrains Mono', Consolas, monospace" font-size="10.5" font-weight="700">AMD/Intel iGPU</text>
+      </g>
+    </g>
+  </g>
+
+  <!-- Bottom-Left Avatar Safe Zone HUD & Hardware Submission Box -->
+  <g transform="translate(60, 310)">
+    <!-- Radar Reticle Base (Avatar Safe Zone) -->
+    <g transform="translate(90, 85)">
+      <circle cx="0" cy="0" r="76" fill="none" stroke="#334155" stroke-width="1" stroke-dasharray="4,4" />
+      <circle cx="0" cy="0" r="54" fill="#0b1324" fill-opacity="0.4" stroke="#1e293b" stroke-width="1.5" />
+      <circle cx="0" cy="0" r="28" fill="none" stroke="#38bdf8" stroke-opacity="0.3" stroke-width="1" />
+      <circle cx="0" cy="0" r="3" fill="#38bdf8" filter="url(#glowCyan)" />
+
+      <!-- Crosshairs -->
+      <line x1="-84" y1="0" x2="84" y2="0" stroke="#334155" stroke-width="0.8" />
+      <line x1="0" y1="-84" x2="0" y2="84" stroke="#334155" stroke-width="0.8" />
+
+      <!-- Angle Markings -->
+      <text x="0" y="-60" fill="#475569" font-family="'JetBrains Mono', Consolas, monospace" font-size="8" text-anchor="middle">000°</text>
+      <text x="66" y="3" fill="#475569" font-family="'JetBrains Mono', Consolas, monospace" font-size="8">090°</text>
+      <text x="0" y="68" fill="#475569" font-family="'JetBrains Mono', Consolas, monospace" font-size="8" text-anchor="middle">180°</text>
+      <text x="-66" y="3" fill="#475569" font-family="'JetBrains Mono', Consolas, monospace" font-size="8" text-anchor="end">270°</text>
+
+      <text x="0" y="-12" fill="#38bdf8" font-family="'JetBrains Mono', Consolas, monospace" font-size="9" font-weight="700" text-anchor="middle" letter-spacing="1">AVATAR_ZONE</text>
+      <text x="0" y="16" fill="#64748b" font-family="'JetBrains Mono', Consolas, monospace" font-size="8" text-anchor="middle">SAFE_CADENCE</text>
+    </g>
+
+    <!-- Quickstart Telemetry Box (x=195..470) -->
+    <g transform="translate(195, 10)">
+      <rect width="275" height="152" rx="6" fill="url(#cardBg)" stroke="url(#cardBorderCyan)" stroke-width="1" />
+      
+      <!-- Card Header -->
+      <rect x="0" y="0" width="275" height="26" rx="6" fill="#0f172a" fill-opacity="0.8" />
+      <circle cx="12" cy="13" r="3" fill="#38bdf8" />
+      <text x="22" y="17" fill="#94a3b8" font-family="'JetBrains Mono', Consolas, monospace" font-size="10" font-weight="700" letter-spacing="1">QUICK_SUBMIT // CLI</text>
+
+      <!-- Command Rows -->
+      <g transform="translate(12, 38)">
+        <text x="0" y="12" fill="#64748b" font-family="'JetBrains Mono', Consolas, monospace" font-size="9.5">STEP 1: PULL ANY MODEL</text>
+        <text x="0" y="28" fill="#38bdf8" font-family="'JetBrains Mono', Consolas, monospace" font-size="10" font-weight="700">ollama pull qwen2.5:0.5b</text>
+
+        <text x="0" y="52" fill="#64748b" font-family="'JetBrains Mono', Consolas, monospace" font-size="9.5">STEP 2: BENCHMARK (2 MINS)</text>
+        <text x="0" y="68" fill="#34d399" font-family="'JetBrains Mono', Consolas, monospace" font-size="10" font-weight="700">uvx servebench submit</text>
+
+        <text x="0" y="92" fill="#64748b" font-family="'JetBrains Mono', Consolas, monospace" font-size="9.5">STEP 3: PR TO GITHUB</text>
+        <text x="0" y="106" fill="#cbd5e1" font-family="'JetBrains Mono', Consolas, monospace" font-size="9">data/results/runsonmine-*.json</text>
+      </g>
+    </g>
+  </g>
+
+  <!-- ========================================================================= -->
+  <!-- ZONE 2: CENTER COMPARISON CARD: REALITY VS ESTIMATE (x=550..1020)          -->
+  <!-- ========================================================================= -->
+  <g transform="translate(550, 55)">
+    <!-- Card Frame -->
+    <rect width="470" height="416" rx="8" fill="url(#cardBg)" stroke="url(#cardBorderCyan)" stroke-width="1.2" />
+
+    <!-- Card Header Strip -->
+    <rect x="0" y="0" width="470" height="34" rx="8" fill="#0f172a" fill-opacity="0.9" />
+    <circle cx="16" cy="17" r="4" fill="#38bdf8" filter="url(#glowCyan)" />
+    <text x="28" y="21" fill="#f8fafc" font-family="'JetBrains Mono', Consolas, monospace" font-size="12" font-weight="800" letter-spacing="1.2">
+      WHY MEASURED: THE ESTIMATE GAP
+    </text>
+    <text x="454" y="21" fill="#64748b" font-family="'JetBrains Mono', Consolas, monospace" font-size="10" text-anchor="end">
+      RTX 3050 LAPTOP
+    </text>
+
+    <!-- Discrepancy Graphic -->
+    <g transform="translate(24, 52)">
+      <!-- Subtitle -->
+      <text x="0" y="10" fill="#94a3b8" font-family="'JetBrains Mono', Consolas, monospace" font-size="10">
+        MODEL: <tspan fill="#f1f5f9" font-weight="700">Qwen 2.5 0.5B</tspan> | MEMORY BUS: <tspan fill="#38bdf8" font-weight="700">128-bit GDDR6</tspan>
+      </text>
+
+      <!-- Bar 1: Theoretical Calculator Estimate -->
+      <g transform="translate(0, 30)">
+        <text x="0" y="12" fill="#94a3b8" font-family="'JetBrains Mono', Consolas, monospace" font-size="10.5">
+          THEORETICAL ROOFLINE CALCULATOR:
+        </text>
+        <text x="420" y="12" fill="#f87171" font-family="'JetBrains Mono', Consolas, monospace" font-size="12" font-weight="800" text-anchor="end">
+          444 tok/s
+        </text>
+
+        <rect x="0" y="20" width="420" height="22" rx="4" fill="#1e293b" />
+        <rect x="0" y="20" width="420" height="22" rx="4" fill="url(#amberGrad)" opacity="0.8" />
+        <text x="12" y="35" fill="#ffffff" font-family="'JetBrains Mono', Consolas, monospace" font-size="9" font-weight="700">
+          THEORETICAL MAXIMUM (ASSUMES 100% BANDWIDTH &amp; ZERO OVERHEAD)
+        </text>
+      </g>
+
+      <!-- Bar 2: RunsOnMine Real Measured Speed -->
+      <g transform="translate(0, 85)">
+        <text x="0" y="12" fill="#94a3b8" font-family="'JetBrains Mono', Consolas, monospace" font-size="10.5">
+          RUNSONMINE MEASURED SPEED (OLLAMA):
+        </text>
+        <text x="420" y="12" fill="#34d399" font-family="'JetBrains Mono', Consolas, monospace" font-size="14" font-weight="800" text-anchor="end">
+          164 tok/s
+        </text>
+
+        <rect x="0" y="20" width="420" height="26" rx="4" fill="#1e293b" />
+        <!-- 164 / 444 * 420 ≈ 155 width -->
+        <rect x="0" y="20" width="155" height="26" rx="4" fill="url(#emeraldGrad)" filter="url(#glowEmerald)" />
+        <text x="12" y="37" fill="#022c22" font-family="'JetBrains Mono', Consolas, monospace" font-size="10" font-weight="800">
+          EMPIRICAL REALITY
+        </text>
+      </g>
+
+      <!-- Callout Call: The Real Gap -->
+      <g transform="translate(0, 160)">
+        <rect width="420" height="42" rx="5" fill="#1e1b4b" stroke="#8b5cf6" stroke-width="1.2" />
+        <text x="14" y="18" fill="#c4b5fd" font-family="'JetBrains Mono', Consolas, monospace" font-size="10" font-weight="700">
+          ▲ 280 tok/s GAP (63% ESTIMATE ERROR)
+        </text>
+        <text x="14" y="32" fill="#94a3b8" font-family="'JetBrains Mono', Consolas, monospace" font-size="9">
+          Why? GPU power state, real laptop memory clocks, and engine overhead.
+        </text>
+      </g>
+
+      <!-- Kaggle Comparison Item -->
+      <g transform="translate(0, 218)">
+        <rect width="420" height="46" rx="5" fill="#090e1a" stroke="#1e293b" stroke-width="1" />
+        <circle cx="16" cy="23" r="3" fill="#38bdf8" />
+        <text x="28" y="18" fill="#f1f5f9" font-family="'JetBrains Mono', Consolas, monospace" font-size="10" font-weight="700">
+          KAGGLE T4 (FREE CLOUD GPU):
+        </text>
+        <text x="28" y="34" fill="#94a3b8" font-family="'JetBrains Mono', Consolas, monospace" font-size="9">
+          No local GPU? Free Kaggle notebook submitted 112 tok/s on T4.
+        </text>
+        <text x="408" y="26" fill="#38bdf8" font-family="'JetBrains Mono', Consolas, monospace" font-size="10" font-weight="700" text-anchor="end">
+          MEASURED
+        </text>
+      </g>
+    </g>
+
+    <!-- Bottom Roofline Takeaway Footer -->
+    <g transform="translate(16, 360)">
+      <rect width="438" height="42" rx="5" fill="#090e1a" stroke="#1e293b" stroke-width="1" />
+      <text x="14" y="18" fill="#cbd5e1" font-family="'JetBrains Mono', Consolas, monospace" font-size="10" font-weight="600">
+        CORE TAKEAWAY: <tspan fill="#34d399">"Can I run it?" calculators guess.</tspan>
+      </text>
+      <text x="14" y="32" fill="#94a3b8" font-family="'JetBrains Mono', Consolas, monospace" font-size="9">
+        RunsOnMine tests real software stacks on real silicon before you download.
+      </text>
+    </g>
+  </g>
+
+  <!-- ========================================================================= -->
+  <!-- ZONE 3: RIGHT SYSTEMS CARDS: VALIDATION & DATA (x=1035..1460)              -->
+  <!-- ========================================================================= -->
+
+  <!-- Top Right Card: Physical Validity Enforcement (y=55..250) -->
+  <g transform="translate(1035, 55)">
+    <!-- Card Frame -->
+    <rect width="425" height="198" rx="8" fill="url(#cardBg)" stroke="url(#cardBorderEmerald)" stroke-width="1.2" />
+
+    <!-- Card Header -->
+    <rect x="0" y="0" width="425" height="30" rx="8" fill="#0f172a" fill-opacity="0.9" />
+    <circle cx="14" cy="15" r="3.5" fill="#10b981" filter="url(#glowEmerald)" />
+    <text x="26" y="19" fill="#f8fafc" font-family="'JetBrains Mono', Consolas, monospace" font-size="11" font-weight="800" letter-spacing="1">
+      PHYSICAL VALIDITY CHECKS (CI)
+    </text>
+    <text x="412" y="19" fill="#10b981" font-family="'JetBrains Mono', Consolas, monospace" font-size="9" font-weight="700" text-anchor="end">
+      AUTOMATED GATE
+    </text>
+
+    <!-- Validation Rules Content -->
+    <g transform="translate(14, 42)">
+      <!-- Physics Formula -->
+      <rect width="396" height="32" rx="4" fill="#060b17" stroke="#1e293b" stroke-width="1" />
+      <text x="198" y="20" fill="#f1f5f9" font-family="'JetBrains Mono', Consolas, monospace" font-size="10" font-weight="700" text-anchor="middle">
+        Max Speed &lt;= Memory Bandwidth / Model Size
+      </text>
+
+      <g transform="translate(0, 44)">
+        <!-- Rule 1 -->
+        <text x="0" y="12" fill="#34d399" font-family="'JetBrains Mono', Consolas, monospace" font-size="9" font-weight="700">✓ PHYSICAL ROOFLINE CAP:</text>
+        <text x="0" y="26" fill="#94a3b8" font-family="'JetBrains Mono', Consolas, monospace" font-size="8.5">
+          Speeds exceeding theoretical DRAM bandwidth rejected automatically.
+        </text>
+
+        <!-- Rule 2 -->
+        <text x="0" y="46" fill="#fbbf24" font-family="'JetBrains Mono', Consolas, monospace" font-size="9" font-weight="700">⚠ RUN CONDITION FLAGGING:</text>
+        <text x="0" y="60" fill="#94a3b8" font-family="'JetBrains Mono', Consolas, monospace" font-size="8.5">
+          Battery runs, thermal throttles, or CPU offload quarantined from "best".
+        </text>
+
+        <!-- Rule 3 -->
+        <text x="0" y="80" fill="#38bdf8" font-family="'JetBrains Mono', Consolas, monospace" font-size="9" font-weight="700">🛡 ZERO PRIVATE DATA LEAKED:</text>
+        <text x="0" y="94" fill="#94a3b8" font-family="'JetBrains Mono', Consolas, monospace" font-size="8.5">
+          No usernames, IPs, filepaths, prompts, or model output ever collected.
+        </text>
+      </g>
+    </g>
+  </g>
+
+  <!-- Bottom Right Card: Community & Open Data (y=265..471) -->
+  <g transform="translate(1035, 265)">
+    <!-- Card Frame -->
+    <rect width="425" height="206" rx="8" fill="url(#cardBg)" stroke="url(#cardBorderCyan)" stroke-width="1.2" />
+
+    <!-- Card Header -->
+    <rect x="0" y="0" width="425" height="30" rx="8" fill="#0f172a" fill-opacity="0.9" />
+    <circle cx="14" cy="15" r="3.5" fill="#38bdf8" filter="url(#glowCyan)" />
+    <text x="26" y="19" fill="#f8fafc" font-family="'JetBrains Mono', Consolas, monospace" font-size="11" font-weight="800" letter-spacing="1">
+      OPEN DATA &amp; COMMUNITY PIPELINE
+    </text>
+    <text x="412" y="19" fill="#38bdf8" font-family="'JetBrains Mono', Consolas, monospace" font-size="9" font-weight="700" text-anchor="end">
+      CC BY 4.0
+    </text>
+
+    <!-- Submission Schema Details -->
+    <g transform="translate(14, 40)">
+      <rect width="396" height="42" rx="4" fill="#060b17" stroke="#1e293b" stroke-width="1" />
+      <text x="14" y="16" fill="#cbd5e1" font-family="'JetBrains Mono', Consolas, monospace" font-size="9" font-weight="600">
+        SUBMISSION FORMAT: <tspan fill="#38bdf8">JSON with content hash</tspan>
+      </text>
+      <text x="14" y="32" fill="#64748b" font-family="'JetBrains Mono', Consolas, monospace" font-size="8.5">
+        Includes GPU clock, power (W), AC status, driver version, token latency.
+      </text>
+
+      <!-- Static Site Generator Pill -->
+      <g transform="translate(0, 52)">
+        <text x="0" y="12" fill="#64748b" font-family="'JetBrains Mono', Consolas, monospace" font-size="9" font-weight="700">STATIC SITE &amp; DATA PIPELINE:</text>
+        
+        <g transform="translate(0, 20)">
+          <rect width="396" height="20" rx="3" fill="#0f172a" stroke="#1e293b" stroke-width="1" />
+          <text x="10" y="14" fill="#38bdf8" font-family="'JetBrains Mono', Consolas, monospace" font-size="8.5" font-weight="700">uv run runsonmine validate data/results</text>
+        </g>
+
+        <g transform="translate(0, 44)">
+          <rect width="396" height="20" rx="3" fill="#0f172a" stroke="#1e293b" stroke-width="1" />
+          <text x="10" y="14" fill="#34d399" font-family="'JetBrains Mono', Consolas, monospace" font-size="8.5" font-weight="700">uv run runsonmine build-site --out site</text>
+        </g>
+      </g>
+
+      <!-- Bottom Health Status -->
+      <g transform="translate(0, 134)">
+        <text x="0" y="8" fill="#64748b" font-family="'JetBrains Mono', Consolas, monospace" font-size="8">
+          LIVE AT: <tspan fill="#f1f5f9" font-weight="700">prajwal7-2002.github.io/runsonmine</tspan> | CODE: <tspan fill="#10b981">APACHE 2.0</tspan>
+        </text>
+      </g>
+    </g>
+  </g>
+</svg>

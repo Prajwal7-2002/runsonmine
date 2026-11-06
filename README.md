@@ -1,3 +1,7 @@
+<p align="center">
+  <img src="./assets/banner.svg" alt="RunsOnMine banner" width="100%">
+</p>
+
 # RunsOnMine
 
 **How fast do local AI models really run on real computers?** RunsOnMine collects *measured*
