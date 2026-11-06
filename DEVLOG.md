@@ -45,3 +45,11 @@ First cloud results (Kaggle "GPU T4 x2", Ollama 0.40.15) exposed two problems:
   to 1.7 s; the laptop's Ollama 0.35.1 batched (417 tok/s at 4 users). Engine settings matter as much
   as the GPU; recording them is a future format addition.
 - Notebook: `env -u PYTHONPATH` (Kaggle's sitecustomize needs `wrapt`), errors are no longer hidden.
+
+## 2026-11-07: Kaggle T4 re-run (servebench 1.1.6)
+
+- qwen2.5 1.5b/3b/7b re-measured with `serving_gpu: 0`; the GPU is genuinely busy (80-97%, 65-66 W of
+  70 W) and speeds match the first run (136 / 77 / 29 tok/s for 1 user). 8 results total.
+- Notebook bug: `!` lines in Jupyter substitute `{var}` only if the whole line parses; a grep pattern
+  containing braces made `{model}` go through literally (servebench asked Ollama for "{model}"). The
+  models cell is now plain Python (subprocess), restarts Ollama if it stops, and keeps errors visible.
