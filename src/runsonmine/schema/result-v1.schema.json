@@ -4,40 +4,99 @@
   "title": "RunsOnMine result v1",
   "type": "object",
   "additionalProperties": false,
-  "required": ["schema", "date", "tool", "test", "hardware", "engine", "model", "results", "conditions"],
+  "required": [
+    "schema",
+    "date",
+    "tool",
+    "test",
+    "hardware",
+    "engine",
+    "model",
+    "results",
+    "conditions"
+  ],
   "properties": {
-    "schema": { "const": "runsonmine/result/v1" },
-    "date": { "type": "string", "pattern": "^\\d{4}-\\d{2}-\\d{2}$" },
+    "schema": {
+      "const": "runsonmine/result/v1"
+    },
+    "date": {
+      "type": "string",
+      "pattern": "^\\d{4}-\\d{2}-\\d{2}$"
+    },
     "tool": {
       "type": "object",
       "additionalProperties": false,
-      "required": ["name", "version"],
+      "required": [
+        "name",
+        "version"
+      ],
       "properties": {
-        "name": { "const": "servebench" },
-        "version": { "type": "string", "maxLength": 32 }
+        "name": {
+          "const": "servebench"
+        },
+        "version": {
+          "type": "string",
+          "maxLength": 32
+        }
       }
     },
     "test": {
       "type": "object",
       "additionalProperties": false,
-      "required": ["name", "users", "requests_per_level", "input_tokens", "output_tokens",
-                   "warmup_requests", "seed", "ignore_eos", "temperature"],
+      "required": [
+        "name",
+        "users",
+        "requests_per_level",
+        "input_tokens",
+        "output_tokens",
+        "warmup_requests",
+        "seed",
+        "ignore_eos",
+        "temperature"
+      ],
       "properties": {
-        "name": { "const": "standard-v1" },
-        "users": { "const": [1, 2, 4] },
-        "requests_per_level": { "const": 16 },
-        "input_tokens": { "const": 256 },
-        "output_tokens": { "const": 128 },
-        "warmup_requests": { "const": 2 },
-        "seed": { "const": 1 },
-        "ignore_eos": { "const": true },
-        "temperature": { "const": 0.0 }
+        "name": {
+          "const": "standard-v1"
+        },
+        "users": {
+          "const": [
+            1,
+            2,
+            4
+          ]
+        },
+        "requests_per_level": {
+          "const": 16
+        },
+        "input_tokens": {
+          "const": 256
+        },
+        "output_tokens": {
+          "const": 128
+        },
+        "warmup_requests": {
+          "const": 2
+        },
+        "seed": {
+          "const": 1
+        },
+        "ignore_eos": {
+          "const": true
+        },
+        "temperature": {
+          "const": 0.0
+        }
       }
     },
     "hardware": {
       "type": "object",
       "additionalProperties": false,
-      "required": ["gpus", "cpu", "ram_gb", "os"],
+      "required": [
+        "gpus",
+        "cpu",
+        "ram_gb",
+        "os"
+      ],
       "properties": {
         "gpus": {
           "type": "array",
@@ -45,39 +104,107 @@
           "items": {
             "type": "object",
             "additionalProperties": false,
-            "required": ["name"],
+            "required": [
+              "name"
+            ],
             "properties": {
-              "name": { "type": "string", "maxLength": 120 },
-              "vram_gb": { "type": "number", "minimum": 0 },
-              "driver": { "type": "string", "maxLength": 40 }
+              "name": {
+                "type": "string",
+                "maxLength": 120
+              },
+              "vram_gb": {
+                "type": "number",
+                "minimum": 0
+              },
+              "driver": {
+                "type": "string",
+                "maxLength": 40
+              }
             }
           }
         },
-        "cpu": { "type": ["string", "null"], "maxLength": 120 },
-        "ram_gb": { "type": ["number", "null"], "minimum": 0 },
-        "os": { "type": "string", "maxLength": 60 }
+        "cpu": {
+          "type": [
+            "string",
+            "null"
+          ],
+          "maxLength": 120
+        },
+        "ram_gb": {
+          "type": [
+            "number",
+            "null"
+          ],
+          "minimum": 0
+        },
+        "os": {
+          "type": "string",
+          "maxLength": 60
+        },
+        "serving_gpu": {
+          "type": "integer",
+          "minimum": 0,
+          "maximum": 15,
+          "description": "Index in gpus of the GPU that served the model and whose conditions were recorded"
+        }
       }
     },
     "engine": {
       "type": "object",
       "additionalProperties": false,
-      "required": ["name", "version"],
+      "required": [
+        "name",
+        "version"
+      ],
       "properties": {
-        "name": { "type": ["string", "null"], "maxLength": 60 },
-        "version": { "type": ["string", "null"], "maxLength": 60 }
+        "name": {
+          "type": [
+            "string",
+            "null"
+          ],
+          "maxLength": 60
+        },
+        "version": {
+          "type": [
+            "string",
+            "null"
+          ],
+          "maxLength": 60
+        }
       }
     },
     "model": {
       "type": "object",
       "additionalProperties": false,
-      "required": ["name"],
+      "required": [
+        "name"
+      ],
       "properties": {
-        "name": { "type": "string", "minLength": 1, "maxLength": 200 },
-        "parameter_count": { "type": "integer", "minimum": 1 },
-        "parameters": { "type": "string", "maxLength": 20 },
-        "quantization": { "type": "string", "maxLength": 40 },
-        "weights_gb": { "type": "number", "exclusiveMinimum": 0 },
-        "on_gpu": { "type": "string", "pattern": "^\\d{1,3}%$" }
+        "name": {
+          "type": "string",
+          "minLength": 1,
+          "maxLength": 200
+        },
+        "parameter_count": {
+          "type": "integer",
+          "minimum": 1
+        },
+        "parameters": {
+          "type": "string",
+          "maxLength": 20
+        },
+        "quantization": {
+          "type": "string",
+          "maxLength": 40
+        },
+        "weights_gb": {
+          "type": "number",
+          "exclusiveMinimum": 0
+        },
+        "on_gpu": {
+          "type": "string",
+          "pattern": "^\\d{1,3}%$"
+        }
       }
     },
     "results": {
@@ -87,17 +214,64 @@
       "items": {
         "type": "object",
         "additionalProperties": false,
-        "required": ["users", "ok", "failed", "output_tok_s", "per_user_tok_s",
-                     "ttft_ms_p50", "ttft_ms_p90", "tpot_ms_p50"],
+        "required": [
+          "users",
+          "ok",
+          "failed",
+          "output_tok_s",
+          "per_user_tok_s",
+          "ttft_ms_p50",
+          "ttft_ms_p90",
+          "tpot_ms_p50"
+        ],
         "properties": {
-          "users": { "enum": [1, 2, 4] },
-          "ok": { "type": "integer", "minimum": 0 },
-          "failed": { "type": "integer", "minimum": 0 },
-          "output_tok_s": { "type": "number", "minimum": 0 },
-          "per_user_tok_s": { "type": ["number", "null"], "minimum": 0 },
-          "ttft_ms_p50": { "type": ["number", "null"], "minimum": 0 },
-          "ttft_ms_p90": { "type": ["number", "null"], "minimum": 0 },
-          "tpot_ms_p50": { "type": ["number", "null"], "minimum": 0 }
+          "users": {
+            "enum": [
+              1,
+              2,
+              4
+            ]
+          },
+          "ok": {
+            "type": "integer",
+            "minimum": 0
+          },
+          "failed": {
+            "type": "integer",
+            "minimum": 0
+          },
+          "output_tok_s": {
+            "type": "number",
+            "minimum": 0
+          },
+          "per_user_tok_s": {
+            "type": [
+              "number",
+              "null"
+            ],
+            "minimum": 0
+          },
+          "ttft_ms_p50": {
+            "type": [
+              "number",
+              "null"
+            ],
+            "minimum": 0
+          },
+          "ttft_ms_p90": {
+            "type": [
+              "number",
+              "null"
+            ],
+            "minimum": 0
+          },
+          "tpot_ms_p50": {
+            "type": [
+              "number",
+              "null"
+            ],
+            "minimum": 0
+          }
         }
       }
     },
@@ -105,13 +279,36 @@
       "type": "object",
       "additionalProperties": false,
       "properties": {
-        "power_source": { "enum": ["ac", "battery"] },
-        "gpu_clock_avg_mhz": { "type": "number", "minimum": 0 },
-        "gpu_clock_max_mhz": { "type": "number", "minimum": 0 },
-        "gpu_power_avg_w": { "type": "number", "minimum": 0 },
-        "gpu_power_limit_w": { "type": "number", "minimum": 0 },
-        "gpu_util_avg_pct": { "type": "number", "minimum": 0, "maximum": 100 },
-        "gpu_temp_max_c": { "type": "number" }
+        "power_source": {
+          "enum": [
+            "ac",
+            "battery"
+          ]
+        },
+        "gpu_clock_avg_mhz": {
+          "type": "number",
+          "minimum": 0
+        },
+        "gpu_clock_max_mhz": {
+          "type": "number",
+          "minimum": 0
+        },
+        "gpu_power_avg_w": {
+          "type": "number",
+          "minimum": 0
+        },
+        "gpu_power_limit_w": {
+          "type": "number",
+          "minimum": 0
+        },
+        "gpu_util_avg_pct": {
+          "type": "number",
+          "minimum": 0,
+          "maximum": 100
+        },
+        "gpu_temp_max_c": {
+          "type": "number"
+        }
       }
     }
   }

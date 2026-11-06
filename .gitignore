@@ -5,3 +5,5 @@ __pycache__/
 .ruff_cache/
 dist/
 site/
+# result files waiting to be checked with `runsonmine add`
+incoming/
