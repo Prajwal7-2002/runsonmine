@@ -17,3 +17,14 @@
 - `runsonmine build-site`: static HTML (no JavaScript, light/dark) plus `results.json`.
 - Results are produced by `servebench submit` (servebench 1.1.5).
 - 14 tests; CI on Windows/macOS/Linux validates every submitted result; Pages workflow deploys the site.
+
+## 2026-11-07: v0.2.0 - Contributor guide, Kaggle notebook, upload service
+
+- `docs/contribute.md`: Mac/Windows/Linux steps using `uvx servebench submit` (uv brings its own
+  Python; macOS ships 3.9, servebench needs 3.11), model sizes per memory, and a message for friends.
+- `contrib/kaggle-runsonmine.ipynb`: free T4/P100 runs (Ollama + 5 Apache-2.0 models).
+- `runsonmine.service`: FastAPI upload service for a Hugging Face Space. Validates with the same
+  checks as CI, skips duplicates by content hash, opens a GitHub pull request (token limited to this
+  repo), rate-limits per IP in memory, stores nothing. `space/` holds the Space config.
+- Live check: the GitHub client's read calls work against the real repo; the write path is tested
+  with a fake GitHub until the Space is deployed. 21 tests.

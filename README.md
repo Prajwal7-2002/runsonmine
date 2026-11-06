@@ -17,18 +17,19 @@ the engine's overhead, the quantization format, and the laptop's real memory clo
 laptop, a roofline estimate said 444 tokens/s for a small model; Ollama really did 164. Every number
 here comes from a real run.
 
-## Add your machine (about 2 minutes)
+## Add your machine (about 5 minutes)
 
-1. Start a model in Ollama, llama.cpp or LM Studio on your computer, plugged in (not on battery).
-2. Run:
-   ```bash
-   pip install -U servebench
-   servebench submit
-   ```
-   It runs a standard test (1, 2 and 4 users), prints the whole result file, and saves it as
-   `runsonmine-<engine>-<model>.json`.
-3. Open a pull request adding that file to [`data/results/`](data/results/). CI checks it
-   automatically. (A one-command upload is coming.)
+Step-by-step for Mac, Windows and Linux, plus a message you can send friends:
+**[docs/contribute.md](docs/contribute.md)**. In short:
+
+```bash
+ollama pull qwen2.5:0.5b                        # any model you like
+uvx servebench submit --model qwen2.5:0.5b      # standard test, ~2 minutes, plugged in
+```
+
+then add the `runsonmine-*.json` file it saves to [`data/results/`](data/results/) in a pull
+request. No GPU of your own? [`contrib/kaggle-runsonmine.ipynb`](contrib/kaggle-runsonmine.ipynb)
+measures Kaggle's free T4 and P100 GPUs.
 
 **What is shared:** GPU/CPU model names, RAM, OS, engine and model details, the measured speeds,
 and run conditions (AC or battery, GPU clock and power). **Never:** hostname, username, IP
