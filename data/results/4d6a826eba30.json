@@ -1,0 +1,93 @@
+{
+  "schema": "runsonmine/result/v1",
+  "date": "2026-11-06",
+  "tool": {
+    "name": "servebench",
+    "version": "1.1.6"
+  },
+  "test": {
+    "name": "standard-v1",
+    "users": [
+      1,
+      2,
+      4
+    ],
+    "requests_per_level": 16,
+    "input_tokens": 256,
+    "output_tokens": 128,
+    "warmup_requests": 2,
+    "seed": 1,
+    "ignore_eos": true,
+    "temperature": 0.0
+  },
+  "hardware": {
+    "gpus": [
+      {
+        "name": "Tesla T4",
+        "vram_gb": 15.0,
+        "driver": "580.178.04"
+      },
+      {
+        "name": "Tesla T4",
+        "vram_gb": 15.0,
+        "driver": "580.178.04"
+      }
+    ],
+    "serving_gpu": 0,
+    "cpu": "Intel(R) Xeon(R) CPU @ 2.00GHz",
+    "ram_gb": 31.3,
+    "os": "Linux 6.18.55+"
+  },
+  "engine": {
+    "name": "Ollama",
+    "version": "0.40.15"
+  },
+  "model": {
+    "name": "qwen2.5:3b",
+    "parameter_count": 3085938688,
+    "parameters": "3.1B",
+    "quantization": "Q4_K_M",
+    "weights_gb": 1.93,
+    "on_gpu": "100%"
+  },
+  "results": [
+    {
+      "users": 1,
+      "ok": 16,
+      "failed": 0,
+      "output_tok_s": 72.38,
+      "per_user_tok_s": 77.44,
+      "ttft_ms_p50": 124.6,
+      "ttft_ms_p90": 131.3,
+      "tpot_ms_p50": 12.9
+    },
+    {
+      "users": 2,
+      "ok": 16,
+      "failed": 0,
+      "output_tok_s": 67.3,
+      "per_user_tok_s": 72.01,
+      "ttft_ms_p50": 2004.7,
+      "ttft_ms_p90": 2103.5,
+      "tpot_ms_p50": 13.9
+    },
+    {
+      "users": 4,
+      "ok": 16,
+      "failed": 0,
+      "output_tok_s": 67.51,
+      "per_user_tok_s": 72.32,
+      "ttft_ms_p50": 5745.2,
+      "ttft_ms_p90": 5996.2,
+      "tpot_ms_p50": 13.8
+    }
+  ],
+  "conditions": {
+    "gpu_clock_avg_mhz": 921.6,
+    "gpu_clock_max_mhz": 1590.0,
+    "gpu_power_avg_w": 66.3,
+    "gpu_power_limit_w": 70.0,
+    "gpu_util_avg_pct": 93.2,
+    "gpu_temp_max_c": 81.0
+  }
+}
