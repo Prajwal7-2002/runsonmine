@@ -78,3 +78,39 @@ def test_file_name_must_be_the_content_hash(result, tmp_path):
 def test_content_id_ignores_key_order(result):
     shuffled = dict(reversed(list(result.items())))
     assert content_id(shuffled) == content_id(result)
+
+
+def test_power_limited_datacentre_gpu_is_not_throttled(result):
+    # Tesla T4 under full load: 97% busy at its 70 W limit, clock 654 of 1590 MHz (normal)
+    result["hardware"]["gpus"] = [{"name": "Tesla T4", "vram_gb": 15.0}]
+    result["conditions"].update(
+        gpu_clock_avg_mhz=653.7,
+        gpu_clock_max_mhz=1590.0,
+        gpu_power_avg_w=66.9,
+        gpu_power_limit_w=70.0,
+        gpu_util_avg_pct=97.1,
+    )
+    assert "throttled" not in check(result).flags
+
+
+def test_capped_laptop_gpu_is_throttled_even_at_its_power_limit(result):
+    # laptop GPU left at a 10 W cap after battery: 210 of 2100 MHz, at the (lowered) limit
+    result["conditions"].update(
+        gpu_clock_avg_mhz=210.0,
+        gpu_clock_max_mhz=2100.0,
+        gpu_power_avg_w=10.4,
+        gpu_power_limit_w=10.0,
+        gpu_util_avg_pct=95.0,
+    )
+    assert "throttled" in check(result).flags
+
+
+def test_serving_gpu_selects_the_ceiling_gpu(result):
+    result["hardware"]["gpus"] = [
+        {"name": "Tesla T4"},
+        {"name": "NVIDIA GeForce RTX 3050 6GB Laptop GPU"},
+    ]
+    result["hardware"]["serving_gpu"] = 1
+    assert check(result).ceiling_tok_s == round(168 / 0.398, 1)
+    result["hardware"]["serving_gpu"] = 5
+    assert not check(result).ok

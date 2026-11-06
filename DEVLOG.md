@@ -28,3 +28,20 @@
   repo), rate-limits per IP in memory, stores nothing. `space/` holds the Space config.
 - Live check: the GitHub client's read calls work against the real repo; the write path is tested
   with a fake GitHub until the Space is deployed. 21 tests.
+
+## 2026-11-07: v0.3.0 - First Kaggle results; better throttling rule; serving GPU
+
+First cloud results (Kaggle "GPU T4 x2", Ollama 0.40.15) exposed two problems:
+- **Wrong GPU monitored.** Ollama ran 3 of 5 models on the second T4 while servebench monitored the
+  first, so those files reported an idle GPU (0% busy, 585 MHz). Speeds were right, conditions wrong:
+  only the 2 runs on the monitored GPU (qwen2.5:0.5b, mistral:7b) were added; the others will be
+  re-run. Fixes: new optional `hardware.serving_gpu` (which GPU served and was monitored; the ceiling
+  uses it); the notebook pins Ollama to GPU 0; servebench 1.1.6 picks the GPU holding the model.
+- **False "throttled" flag.** A 70 W Tesla T4 at full load runs at its power limit and clocks down
+  (654 of 1590 MHz) by design. New rule: flag below 25% of max clock regardless (the laptop left at a
+  10 W cap: 210 of 2100 MHz), or below 50% only when the GPU is not at its power limit.
+- Also: Ollama 0.40.15 serves one request at a time by default, so on Kaggle 4 users got no more
+  total throughput than 1 (qwen2.5:0.5b: 232 tok/s at 1, 2 and 4 users) while first-token time grew
+  to 1.7 s; the laptop's Ollama 0.35.1 batched (417 tok/s at 4 users). Engine settings matter as much
+  as the GPU; recording them is a future format addition.
+- Notebook: `env -u PYTHONPATH` (Kaggle's sitecustomize needs `wrapt`), errors are no longer hidden.

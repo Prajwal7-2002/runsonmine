@@ -50,6 +50,24 @@ def _level(result: dict, users: int) -> dict | None:
     return next((r for r in result.get("results", []) if r.get("users") == users), None)
 
 
+def _throttled(cond: dict) -> bool:
+    """Busy GPU held far below its clock by something other than its normal power budget.
+
+    A GPU running at its power limit normally clocks down under heavy load (e.g. a 70 W
+    Tesla T4 at ~650 of 1590 MHz): that is how the card works, not a fault. A clock below
+    25% of maximum is flagged regardless (e.g. a laptop GPU left capped at 10 W after running
+    on battery: 210 of 2100 MHz), and below 50% when the GPU is *not* at its power limit.
+    """
+    clock, clock_max = cond.get("gpu_clock_avg_mhz"), cond.get("gpu_clock_max_mhz")
+    util = cond.get("gpu_util_avg_pct")
+    if not (clock and clock_max and util is not None and util >= 50):
+        return False
+    ratio = clock / clock_max
+    power, limit = cond.get("gpu_power_avg_w"), cond.get("gpu_power_limit_w")
+    at_power_limit = bool(power and limit and power >= 0.9 * limit)
+    return ratio < 0.25 or (ratio < 0.5 and not at_power_limit)
+
+
 def check(result: dict) -> Verdict:
     v = Verdict()
     errors = sorted(
@@ -67,7 +85,11 @@ def check(result: dict) -> Verdict:
         return v
 
     gpus = result["hardware"]["gpus"]
-    bandwidth = peak_bandwidth(gpus[0]["name"]) if gpus else None
+    serving = result["hardware"].get("serving_gpu", 0)
+    if gpus and serving >= len(gpus):
+        v.errors.append(f"serving_gpu {serving} but only {len(gpus)} GPU(s) listed")
+        return v
+    bandwidth = peak_bandwidth(gpus[serving]["name"]) if gpus else None
     weights_gb = result["model"].get("weights_gb")
     if bandwidth is None:
         v.flags.append("unknown-gpu")
@@ -87,9 +109,7 @@ def check(result: dict) -> Verdict:
     cond = result["conditions"]
     if cond.get("power_source") == "battery":
         v.flags.append("battery")
-    clock, clock_max = cond.get("gpu_clock_avg_mhz"), cond.get("gpu_clock_max_mhz")
-    util = cond.get("gpu_util_avg_pct")
-    if clock and clock_max and util is not None and util >= 50 and clock < 0.5 * clock_max:
+    if _throttled(cond):
         v.flags.append("throttled")
     on_gpu = result["model"].get("on_gpu")
     if on_gpu and on_gpu != "100%":

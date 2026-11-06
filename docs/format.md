@@ -12,7 +12,7 @@ schema is [`src/runsonmine/schema/result-v1.schema.json`](../src/runsonmine/sche
 | `date` | Day the test ran (UTC), e.g. `2026-11-06`. No time of day. |
 | `tool` | The program that ran the test: `{"name": "servebench", "version": "1.1.5"}`. |
 | `test` | The standard test's settings (below). Results are only comparable when these match. |
-| `hardware` | `gpus` (name, VRAM in GB, driver), `cpu` (model name), `ram_gb`, `os` (e.g. `Windows 11`). |
+| `hardware` | `gpus` (name, VRAM in GB, driver), `serving_gpu` (index in `gpus` of the GPU that served the model and was monitored; default 0), `cpu` (model name), `ram_gb`, `os` (e.g. `Windows 11`). |
 | `engine` | Serving engine name and version as it reports them, e.g. `Ollama` `0.35.1`. |
 | `model` | `name` as the engine knows it; when the engine reports them, `parameter_count`, `parameters` (e.g. `494.03M`), `quantization` (e.g. `Q4_K_M`), `weights_gb` (size of the weights) and `on_gpu` (e.g. `100%`). |
 | `results` | One entry per user count (below). |
@@ -50,7 +50,7 @@ contains the machine's hostname, username, the server address or a local path.
 | File matches the schema | **rejected** if not |
 | Single-user speed is above the physical ceiling (memory bandwidth of the GPU ÷ size of the weights, +15% tolerance) | **rejected**: the hardware cannot do that, so the run or its metadata is wrong |
 | Ran on battery | flagged `battery` |
-| GPU busy (≥ 50%) but clocked below half its maximum | flagged `throttled` |
+| GPU busy (≥ 50%) but clocked below 25% of its maximum, or below 50% while *not* at its power limit | flagged `throttled` (a card at its power limit clocking down under full load, like a 70 W Tesla T4, is normal and not flagged; a laptop GPU left capped at 10 W after running on battery is) |
 | Model not fully on the GPU | flagged `partial-offload` |
 | Any failed requests | flagged `failed-requests` |
 | Engine did not report the weights size | flagged `size-unknown` (no ceiling check possible) |
