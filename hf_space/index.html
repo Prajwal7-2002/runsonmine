@@ -1,0 +1,723 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>RunsOnMine ⚡ Empirical Silicon LLM Benchmark & Submission Studio</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&family=JetBrains+Mono:wght@400;500;700&display=swap" rel="stylesheet">
+  <style>
+    :root {
+      --bg: #0b0f19;
+      --card-bg: #111827;
+      --card-border: #1f293d;
+      --text-main: #f1f5f9;
+      --text-muted: #94a3b8;
+      --accent: #10b981;
+      --accent-glow: rgba(16, 185, 129, 0.15);
+      --cyan: #06b6d4;
+      --purple: #8b5cf6;
+      --amber: #f59e0b;
+      --rose: #f43f5e;
+      --font-sans: 'Inter', -apple-system, BlinkMacSystemFont, sans-serif;
+      --font-mono: 'JetBrains Mono', monospace;
+    }
+
+    * { box-sizing: border-box; margin: 0; padding: 0; }
+    body {
+      background: var(--bg);
+      color: var(--text-main);
+      font-family: var(--font-sans);
+      line-height: 1.5;
+      padding-bottom: 60px;
+    }
+
+    header {
+      background: rgba(17, 24, 39, 0.9);
+      backdrop-filter: blur(12px);
+      border-bottom: 1px solid var(--card-border);
+      position: sticky;
+      top: 0;
+      z-index: 100;
+      padding: 14px 24px;
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+    }
+    .logo-group {
+      display: flex;
+      align-items: center;
+      gap: 12px;
+    }
+    .logo-badge {
+      background: linear-gradient(135deg, #10b981, #f59e0b);
+      color: #0b0f19;
+      font-weight: 800;
+      font-size: 14px;
+      padding: 4px 8px;
+      border-radius: 6px;
+      font-family: var(--font-mono);
+      letter-spacing: -0.5px;
+    }
+    .logo-title {
+      font-weight: 700;
+      font-size: 18px;
+      letter-spacing: -0.3px;
+    }
+    .logo-sub {
+      font-size: 13px;
+      color: var(--text-muted);
+      margin-left: 6px;
+    }
+    .header-links {
+      display: flex;
+      gap: 12px;
+      align-items: center;
+    }
+    .btn-link {
+      background: #1e293b;
+      color: var(--text-main);
+      text-decoration: none;
+      padding: 6px 12px;
+      border-radius: 6px;
+      font-size: 13px;
+      font-weight: 500;
+      border: 1px solid var(--card-border);
+      transition: all 0.15s ease;
+      display: inline-flex;
+      align-items: center;
+      gap: 6px;
+    }
+    .btn-link:hover {
+      background: #334155;
+      border-color: #475569;
+    }
+
+    .container {
+      max-width: 1360px;
+      margin: 0 auto;
+      padding: 24px;
+    }
+
+    .hero {
+      background: linear-gradient(180deg, rgba(16, 185, 129, 0.08) 0%, rgba(11, 15, 25, 0) 100%);
+      border: 1px solid var(--card-border);
+      border-radius: 12px;
+      padding: 24px 28px;
+      margin-bottom: 24px;
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      flex-wrap: wrap;
+      gap: 16px;
+    }
+    .hero-h1 {
+      font-size: 24px;
+      font-weight: 800;
+      letter-spacing: -0.5px;
+      margin-bottom: 6px;
+    }
+    .hero-p {
+      color: var(--text-muted);
+      font-size: 14px;
+      max-width: 820px;
+    }
+    .hero-stats {
+      display: flex;
+      gap: 20px;
+    }
+    .stat-box {
+      background: var(--card-bg);
+      border: 1px solid var(--card-border);
+      border-radius: 8px;
+      padding: 10px 16px;
+      text-align: center;
+    }
+    .stat-val {
+      font-size: 20px;
+      font-weight: 800;
+      font-family: var(--font-mono);
+      color: var(--accent);
+    }
+    .stat-lbl {
+      font-size: 11px;
+      color: var(--text-muted);
+      text-transform: uppercase;
+      letter-spacing: 0.5px;
+      margin-top: 2px;
+    }
+
+    .tab-bar {
+      display: flex;
+      gap: 8px;
+      border-bottom: 1px solid var(--card-border);
+      margin-bottom: 24px;
+      overflow-x: auto;
+      padding-bottom: 4px;
+    }
+    .tab-btn {
+      background: none;
+      border: none;
+      color: var(--text-muted);
+      font-size: 14px;
+      font-weight: 600;
+      padding: 10px 18px;
+      border-radius: 8px 8px 0 0;
+      cursor: pointer;
+      transition: all 0.15s ease;
+      display: inline-flex;
+      align-items: center;
+      gap: 8px;
+      border-bottom: 2px solid transparent;
+      white-space: nowrap;
+    }
+    .tab-btn:hover {
+      color: var(--text-main);
+      background: rgba(255, 255, 255, 0.03);
+    }
+    .tab-btn.active {
+      color: var(--accent);
+      border-bottom-color: var(--accent);
+      background: rgba(16, 185, 129, 0.05);
+    }
+
+    .tab-content {
+      display: none;
+    }
+    .tab-content.active {
+      display: block;
+    }
+
+    .card {
+      background: var(--card-bg);
+      border: 1px solid var(--card-border);
+      border-radius: 12px;
+      padding: 20px;
+      margin-bottom: 24px;
+    }
+    .card-header {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      margin-bottom: 16px;
+      flex-wrap: wrap;
+      gap: 12px;
+    }
+    .card-title {
+      font-size: 17px;
+      font-weight: 700;
+      display: flex;
+      align-items: center;
+      gap: 8px;
+    }
+    .card-sub {
+      font-size: 13px;
+      color: var(--text-muted);
+    }
+
+    .control-group {
+      display: flex;
+      align-items: center;
+      gap: 10px;
+      flex-wrap: wrap;
+    }
+    .pill-btn {
+      background: #1e293b;
+      border: 1px solid var(--card-border);
+      color: var(--text-muted);
+      font-size: 12px;
+      font-weight: 600;
+      padding: 6px 12px;
+      border-radius: 6px;
+      cursor: pointer;
+      transition: all 0.15s ease;
+    }
+    .pill-btn:hover {
+      color: var(--text-main);
+      border-color: #475569;
+    }
+    .pill-btn.active {
+      background: var(--accent);
+      color: #0b0f19;
+      border-color: var(--accent);
+    }
+
+    .chart-container {
+      position: relative;
+      width: 100%;
+      height: 420px;
+      background: #0d1322;
+      border: 1px solid var(--card-border);
+      border-radius: 8px;
+      overflow: hidden;
+    }
+    svg.interactive-plot {
+      width: 100%;
+      height: 100%;
+    }
+
+    .data-table-wrapper {
+      overflow-x: auto;
+      border: 1px solid var(--card-border);
+      border-radius: 8px;
+    }
+    table.data-table {
+      width: 100%;
+      border-collapse: collapse;
+      font-size: 13px;
+      text-align: left;
+    }
+    table.data-table th {
+      background: #131c31;
+      padding: 10px 14px;
+      font-weight: 600;
+      color: var(--text-muted);
+      border-bottom: 1px solid var(--card-border);
+    }
+    table.data-table td {
+      padding: 10px 14px;
+      border-bottom: 1px solid rgba(255, 255, 255, 0.04);
+    }
+    table.data-table tr:hover {
+      background: rgba(255, 255, 255, 0.02);
+    }
+
+    .badge {
+      display: inline-block;
+      padding: 2px 8px;
+      border-radius: 4px;
+      font-size: 11px;
+      font-weight: 600;
+      font-family: var(--font-mono);
+    }
+    .badge-t4 { background: rgba(16, 185, 129, 0.15); color: #10b981; border: 1px solid rgba(16, 185, 129, 0.3); }
+    .badge-rtx { background: rgba(6, 182, 212, 0.15); color: #06b6d4; border: 1px solid rgba(6, 182, 212, 0.3); }
+
+    .code-box {
+      background: #0d1322;
+      border: 1px solid var(--card-border);
+      border-radius: 8px;
+      padding: 14px;
+      font-family: var(--font-mono);
+      font-size: 13px;
+      color: #e2e8f0;
+      position: relative;
+      overflow-x: auto;
+      line-height: 1.6;
+    }
+    .copy-btn {
+      position: absolute;
+      top: 10px;
+      right: 10px;
+      background: #1e293b;
+      border: 1px solid var(--card-border);
+      color: var(--text-muted);
+      font-size: 11px;
+      padding: 4px 8px;
+      border-radius: 4px;
+      cursor: pointer;
+    }
+    .copy-btn:hover {
+      color: var(--text-main);
+      background: #334155;
+    }
+
+    footer {
+      margin-top: 50px;
+      border-top: 1px solid var(--card-border);
+      padding: 30px 24px;
+      text-align: center;
+      color: var(--text-muted);
+      font-size: 13px;
+    }
+    footer a {
+      color: var(--accent);
+      text-decoration: none;
+    }
+    footer a:hover {
+      text-decoration: underline;
+    }
+  </style>
+</head>
+<body>
+
+  <!-- Header -->
+  <header>
+    <div class="logo-group">
+      <div class="logo-badge">RUNSONMINE</div>
+      <div class="logo-title">Empirical Silicon LLM Benchmark Database</div>
+      <span class="logo-sub">Community Benchmark Registry</span>
+    </div>
+    <div class="header-links">
+      <a class="btn-link" href="https://huggingface.co/datasets/prajwalpujari16/consumer-silicon-benchmarks" target="_blank">
+        🤗 HF Dataset (24 Empirical Points)
+      </a>
+      <a class="btn-link" href="https://github.com/Prajwal7-2002/runsonmine" target="_blank">
+        ★ GitHub
+      </a>
+      <a class="btn-link" href="https://github.com/Prajwal7-2002/servebench" target="_blank">
+        ⚡ servebench
+      </a>
+    </div>
+  </header>
+
+  <div class="container">
+
+    <!-- Hero -->
+    <div class="hero">
+      <div>
+        <h1 class="hero-h1">Real-World Consumer Silicon LLM Benchmark Telemetry</h1>
+        <p class="hero-p">
+          Empirical inference performance measurements captured with <strong>servebench</strong> across consumer laptop GPUs and cloud accelerators. Explore concurrency scaling curves, compare engines, and submit your local GPU results.
+        </p>
+      </div>
+      <div class="hero-stats">
+        <div class="stat-box">
+          <div class="stat-val">24</div>
+          <div class="stat-lbl">Empirical Runs</div>
+        </div>
+        <div class="stat-box">
+          <div class="stat-val">231.9</div>
+          <div class="stat-lbl">Max Tok/s (T4)</div>
+        </div>
+        <div class="stat-box">
+          <div class="stat-val">100%</div>
+          <div class="stat-lbl">SLA Attainment</div>
+        </div>
+      </div>
+    </div>
+
+    <!-- Navigation Tabs -->
+    <div class="tab-bar">
+      <button class="tab-btn active" onclick="switchTab('explorer')">📊 Silicon Benchmarks Database</button>
+      <button class="tab-btn" onclick="switchTab('scaling')">📈 Concurrency Scaling Curve (c=1..8)</button>
+      <button class="tab-btn" onclick="switchTab('submit')">📝 Submit Your Hardware Benchmark</button>
+    </div>
+
+    <!-- TAB 1: EXPLORER -->
+    <div id="tab-explorer" class="tab-content active">
+      <div class="card">
+        <div class="card-header">
+          <div>
+            <div class="card-title">Empirical Benchmark Database (24 Hardware Runs)</div>
+            <div class="card-sub">Measured on physical Dual Tesla T4 (30 GB VRAM) & RTX 3050 Laptop (6 GB VRAM)</div>
+          </div>
+          <div class="control-group">
+            <button class="pill-btn active" onclick="filterGPU('all')">All Hardware</button>
+            <button class="pill-btn" onclick="filterGPU('Tesla T4')">Dual Tesla T4</button>
+            <button class="pill-btn" onclick="filterGPU('RTX 3050')">RTX 3050 Laptop</button>
+          </div>
+        </div>
+
+        <div class="data-table-wrapper">
+          <table class="data-table">
+            <thead>
+              <tr>
+                <th>Run ID</th>
+                <th>Hardware GPU</th>
+                <th>VRAM</th>
+                <th>Engine</th>
+                <th>Model</th>
+                <th>Quant</th>
+                <th>Concurrency</th>
+                <th>Throughput (tok/s)</th>
+                <th>TTFT P50 (ms)</th>
+                <th>TPOT P50 (ms)</th>
+              </tr>
+            </thead>
+            <tbody id="bench-tbody"></tbody>
+          </table>
+        </div>
+      </div>
+    </div>
+
+    <!-- TAB 2: CONCURRENCY SCALING -->
+    <div id="tab-scaling" class="tab-content">
+      <div class="card">
+        <div class="card-header">
+          <div>
+            <div class="card-title">Concurrency Scaling on RTX 3050 6GB Laptop GPU</div>
+            <div class="card-sub">Throughput & TTFT behavior as concurrent clients scale from 1 to 8 on Qwen2.5-0.5B</div>
+          </div>
+        </div>
+
+        <div class="chart-container" id="chart-box">
+          <svg class="interactive-plot" id="scaling-svg"></svg>
+        </div>
+
+        <div style="margin-top: 16px;" class="data-table-wrapper">
+          <table class="data-table">
+            <thead>
+              <tr>
+                <th>Concurrency (Users)</th>
+                <th>Output Tok/s</th>
+                <th>Input Tok/s</th>
+                <th>TTFT P50 (ms)</th>
+                <th>TTFT P99 (ms)</th>
+                <th>TPOT P50 (ms)</th>
+                <th>E2E P50 (ms)</th>
+                <th>SLO Attainment %</th>
+              </tr>
+            </thead>
+            <tbody id="scaling-tbody"></tbody>
+          </table>
+        </div>
+      </div>
+    </div>
+
+    <!-- TAB 3: SUBMIT BENCHMARK -->
+    <div id="tab-submit" class="tab-content">
+      <div class="card">
+        <div class="card-header">
+          <div>
+            <div class="card-title">Contribute Your Silicon Benchmark to the Registry</div>
+            <div class="card-sub">Run servebench locally and submit your measurements via pull request</div>
+          </div>
+        </div>
+
+        <div style="margin-bottom: 20px;">
+          <div style="font-size: 13px; font-weight: 600; color: var(--accent); margin-bottom: 8px;">
+            Step 1: Run servebench on your local machine
+          </div>
+          <div class="code-box">
+# Benchmark your local Ollama or vLLM instance
+pip install servebench
+servebench quick --model qwen2.5:0.5b --output my_gpu_benchmark.json
+            <button class="copy-btn" onclick="copyCode(this)">Copy</button>
+          </div>
+        </div>
+
+        <div>
+          <div style="font-size: 13px; font-weight: 600; color: var(--cyan); margin-bottom: 8px;">
+            Step 2: Submit your result via 1-Click Pull Request
+          </div>
+          <p style="font-size: 13px; color: var(--text-muted); margin-bottom: 12px;">
+            Upload your generated JSON file to the <a href="https://github.com/Prajwal7-2002/runsonmine/tree/main/incoming" target="_blank">incoming/</a> directory on GitHub. Our automated CI verifies the telemetry format and merges it into the community benchmark registry!
+          </p>
+          <a class="btn-link" style="background:var(--accent); color:#0b0f19; font-weight:700;" href="https://github.com/Prajwal7-2002/runsonmine/new/main?filename=incoming/my_benchmark.json" target="_blank">
+            🚀 Open Pull Request on GitHub
+          </a>
+        </div>
+      </div>
+    </div>
+
+  </div>
+
+  <!-- Footer -->
+  <footer>
+    <p>
+      <strong>RunsOnMine ⚡</strong> &bull; Crafted by <a href="https://github.com/Prajwal7-2002" target="_blank">Prajwal Pujari</a> &bull;
+      Zero-Cold-Start Static Web Space &bull;
+      <a href="https://huggingface.co/datasets/prajwalpujari16/consumer-silicon-benchmarks" target="_blank">Hugging Face Dataset</a> &bull;
+      <a href="https://github.com/Prajwal7-2002/runsonmine" target="_blank">GitHub Repository</a>
+    </p>
+  </footer>
+
+  <script>
+    const BENCH_DATA = [{"run_id": "02ff90dd8f06", "hardware_gpu": "Tesla T4", "gpu_count": 2, "total_vram_gb": 30.0, "hardware_cpu": "Intel(R) Xeon(R) CPU @ 2.00GHz", "operating_system": "Linux 6.18.55+", "serving_engine": "Ollama", "engine_version": "0.40.15", "model_name": "qwen2.5:0.5b", "parameters": "494.03M", "quantization": "Q4_K_M", "weights_gb": 0.398, "concurrency_users": 1, "output_throughput_tok_s": 231.99, "per_user_tok_s": 246.67, "ttft_p50_ms": 35.4, "ttft_p90_ms": 36.6, "tpot_p50_ms": 4.1, "gpu_clock_mhz": 1545.5, "measured_date": "2026-11-06"}, {"run_id": "02ff90dd8f06", "hardware_gpu": "Tesla T4", "gpu_count": 2, "total_vram_gb": 30.0, "hardware_cpu": "Intel(R) Xeon(R) CPU @ 2.00GHz", "operating_system": "Linux 6.18.55+", "serving_engine": "Ollama", "engine_version": "0.40.15", "model_name": "qwen2.5:0.5b", "parameters": "494.03M", "quantization": "Q4_K_M", "weights_gb": 0.398, "concurrency_users": 2, "output_throughput_tok_s": 232.2, "per_user_tok_s": 245.34, "ttft_p50_ms": 581.0, "ttft_p90_ms": 585.4, "tpot_p50_ms": 4.1, "gpu_clock_mhz": 1545.5, "measured_date": "2026-11-06"}, {"run_id": "02ff90dd8f06", "hardware_gpu": "Tesla T4", "gpu_count": 2, "total_vram_gb": 30.0, "hardware_cpu": "Intel(R) Xeon(R) CPU @ 2.00GHz", "operating_system": "Linux 6.18.55+", "serving_engine": "Ollama", "engine_version": "0.40.15", "model_name": "qwen2.5:0.5b", "parameters": "494.03M", "quantization": "Q4_K_M", "weights_gb": 0.398, "concurrency_users": 4, "output_throughput_tok_s": 229.72, "per_user_tok_s": 243.34, "ttft_p50_ms": 1695.2, "ttft_p90_ms": 1706.9, "tpot_p50_ms": 4.1, "gpu_clock_mhz": 1545.5, "measured_date": "2026-11-06"}, {"run_id": "4d6a826eba30", "hardware_gpu": "Tesla T4", "gpu_count": 2, "total_vram_gb": 30.0, "hardware_cpu": "Intel(R) Xeon(R) CPU @ 2.00GHz", "operating_system": "Linux 6.18.55+", "serving_engine": "Ollama", "engine_version": "0.40.15", "model_name": "qwen2.5:3b", "parameters": "3.1B", "quantization": "Q4_K_M", "weights_gb": 1.93, "concurrency_users": 1, "output_throughput_tok_s": 72.38, "per_user_tok_s": 77.44, "ttft_p50_ms": 124.6, "ttft_p90_ms": 131.3, "tpot_p50_ms": 12.9, "gpu_clock_mhz": 921.6, "measured_date": "2026-11-06"}, {"run_id": "4d6a826eba30", "hardware_gpu": "Tesla T4", "gpu_count": 2, "total_vram_gb": 30.0, "hardware_cpu": "Intel(R) Xeon(R) CPU @ 2.00GHz", "operating_system": "Linux 6.18.55+", "serving_engine": "Ollama", "engine_version": "0.40.15", "model_name": "qwen2.5:3b", "parameters": "3.1B", "quantization": "Q4_K_M", "weights_gb": 1.93, "concurrency_users": 2, "output_throughput_tok_s": 67.3, "per_user_tok_s": 72.01, "ttft_p50_ms": 2004.7, "ttft_p90_ms": 2103.5, "tpot_p50_ms": 13.9, "gpu_clock_mhz": 921.6, "measured_date": "2026-11-06"}, {"run_id": "4d6a826eba30", "hardware_gpu": "Tesla T4", "gpu_count": 2, "total_vram_gb": 30.0, "hardware_cpu": "Intel(R) Xeon(R) CPU @ 2.00GHz", "operating_system": "Linux 6.18.55+", "serving_engine": "Ollama", "engine_version": "0.40.15", "model_name": "qwen2.5:3b", "parameters": "3.1B", "quantization": "Q4_K_M", "weights_gb": 1.93, "concurrency_users": 4, "output_throughput_tok_s": 67.51, "per_user_tok_s": 72.32, "ttft_p50_ms": 5745.2, "ttft_p90_ms": 5996.2, "tpot_p50_ms": 13.8, "gpu_clock_mhz": 921.6, "measured_date": "2026-11-06"}, {"run_id": "5f6f230f76f0", "hardware_gpu": "Tesla T4", "gpu_count": 2, "total_vram_gb": 30.0, "hardware_cpu": "Intel(R) Xeon(R) CPU @ 2.00GHz", "operating_system": "Linux 6.18.55+", "serving_engine": "Ollama", "engine_version": "0.40.15", "model_name": "qwen2.5:7b", "parameters": "7.6B", "quantization": "Q4_K_M", "weights_gb": 4.683, "concurrency_users": 1, "output_throughput_tok_s": 27.86, "per_user_tok_s": 29.4, "ttft_p50_ms": 250.7, "ttft_p90_ms": 255.3, "tpot_p50_ms": 34.0, "gpu_clock_mhz": 594.3, "measured_date": "2026-11-06"}, {"run_id": "5f6f230f76f0", "hardware_gpu": "Tesla T4", "gpu_count": 2, "total_vram_gb": 30.0, "hardware_cpu": "Intel(R) Xeon(R) CPU @ 2.00GHz", "operating_system": "Linux 6.18.55+", "serving_engine": "Ollama", "engine_version": "0.40.15", "model_name": "qwen2.5:7b", "parameters": "7.6B", "quantization": "Q4_K_M", "weights_gb": 4.683, "concurrency_users": 2, "output_throughput_tok_s": 28.8, "per_user_tok_s": 30.13, "ttft_p50_ms": 4684.7, "ttft_p90_ms": 4769.8, "tpot_p50_ms": 33.2, "gpu_clock_mhz": 594.3, "measured_date": "2026-11-06"}, {"run_id": "5f6f230f76f0", "hardware_gpu": "Tesla T4", "gpu_count": 2, "total_vram_gb": 30.0, "hardware_cpu": "Intel(R) Xeon(R) CPU @ 2.00GHz", "operating_system": "Linux 6.18.55+", "serving_engine": "Ollama", "engine_version": "0.40.15", "model_name": "qwen2.5:7b", "parameters": "7.6B", "quantization": "Q4_K_M", "weights_gb": 4.683, "concurrency_users": 4, "output_throughput_tok_s": 28.74, "per_user_tok_s": 30.24, "ttft_p50_ms": 13551.8, "ttft_p90_ms": 13694.8, "tpot_p50_ms": 33.1, "gpu_clock_mhz": 594.3, "measured_date": "2026-11-06"}, {"run_id": "c133ba1d492c", "hardware_gpu": "NVIDIA GeForce RTX 3050 6GB Laptop GPU", "gpu_count": 1, "total_vram_gb": 6.0, "hardware_cpu": "AMD Ryzen 5 6600H with Radeon Graphics", "operating_system": "Windows 11", "serving_engine": "Ollama", "engine_version": "0.35.1", "model_name": "qwen2.5:1.5b", "parameters": "1.5B", "quantization": "Q4_K_M", "weights_gb": 0.986, "concurrency_users": 1, "output_throughput_tok_s": 62.99, "per_user_tok_s": 94.51, "ttft_p50_ms": 79.0, "ttft_p90_ms": 79.9, "tpot_p50_ms": 10.6, "gpu_clock_mhz": 1624.1, "measured_date": "2026-11-06"}, {"run_id": "c133ba1d492c", "hardware_gpu": "NVIDIA GeForce RTX 3050 6GB Laptop GPU", "gpu_count": 1, "total_vram_gb": 6.0, "hardware_cpu": "AMD Ryzen 5 6600H with Radeon Graphics", "operating_system": "Windows 11", "serving_engine": "Ollama", "engine_version": "0.35.1", "model_name": "qwen2.5:1.5b", "parameters": "1.5B", "quantization": "Q4_K_M", "weights_gb": 0.986, "concurrency_users": 2, "output_throughput_tok_s": 86.35, "per_user_tok_s": 67.72, "ttft_p50_ms": 126.9, "ttft_p90_ms": 154.5, "tpot_p50_ms": 14.8, "gpu_clock_mhz": 1624.1, "measured_date": "2026-11-06"}, {"run_id": "c133ba1d492c", "hardware_gpu": "NVIDIA GeForce RTX 3050 6GB Laptop GPU", "gpu_count": 1, "total_vram_gb": 6.0, "hardware_cpu": "AMD Ryzen 5 6600H with Radeon Graphics", "operating_system": "Windows 11", "serving_engine": "Ollama", "engine_version": "0.35.1", "model_name": "qwen2.5:1.5b", "parameters": "1.5B", "quantization": "Q4_K_M", "weights_gb": 0.986, "concurrency_users": 4, "output_throughput_tok_s": 114.41, "per_user_tok_s": 66.01, "ttft_p50_ms": 260.1, "ttft_p90_ms": 288.3, "tpot_p50_ms": 15.1, "gpu_clock_mhz": 1624.1, "measured_date": "2026-11-06"}, {"run_id": "e76e9933d0c6", "hardware_gpu": "Tesla T4", "gpu_count": 2, "total_vram_gb": 30.0, "hardware_cpu": "Intel(R) Xeon(R) CPU @ 2.00GHz", "operating_system": "Linux 6.18.55+", "serving_engine": "Ollama", "engine_version": "0.40.15", "model_name": "qwen2.5:1.5b", "parameters": "1.5B", "quantization": "Q4_K_M", "weights_gb": 0.986, "concurrency_users": 1, "output_throughput_tok_s": 83.54, "per_user_tok_s": 135.97, "ttft_p50_ms": 66.2, "ttft_p90_ms": 72.1, "tpot_p50_ms": 7.4, "gpu_clock_mhz": 1307.8, "measured_date": "2026-11-06"}, {"run_id": "e76e9933d0c6", "hardware_gpu": "Tesla T4", "gpu_count": 2, "total_vram_gb": 30.0, "hardware_cpu": "Intel(R) Xeon(R) CPU @ 2.00GHz", "operating_system": "Linux 6.18.55+", "serving_engine": "Ollama", "engine_version": "0.40.15", "model_name": "qwen2.5:1.5b", "parameters": "1.5B", "quantization": "Q4_K_M", "weights_gb": 0.986, "concurrency_users": 2, "output_throughput_tok_s": 84.89, "per_user_tok_s": 135.52, "ttft_p50_ms": 218.0, "ttft_p90_ms": 222.8, "tpot_p50_ms": 7.4, "gpu_clock_mhz": 1307.8, "measured_date": "2026-11-06"}, {"run_id": "e76e9933d0c6", "hardware_gpu": "Tesla T4", "gpu_count": 2, "total_vram_gb": 30.0, "hardware_cpu": "Intel(R) Xeon(R) CPU @ 2.00GHz", "operating_system": "Linux 6.18.55+", "serving_engine": "Ollama", "engine_version": "0.40.15", "model_name": "qwen2.5:1.5b", "parameters": "1.5B", "quantization": "Q4_K_M", "weights_gb": 0.986, "concurrency_users": 4, "output_throughput_tok_s": 84.12, "per_user_tok_s": 134.34, "ttft_p50_ms": 525.2, "ttft_p90_ms": 531.1, "tpot_p50_ms": 7.4, "gpu_clock_mhz": 1307.8, "measured_date": "2026-11-06"}, {"run_id": "e9d31003acf1", "hardware_gpu": "Tesla T4", "gpu_count": 2, "total_vram_gb": 30.0, "hardware_cpu": "Intel(R) Xeon(R) CPU @ 2.00GHz", "operating_system": "Linux 6.18.55+", "serving_engine": "Ollama", "engine_version": "0.40.15", "model_name": "mistral:7b", "parameters": "7.2B", "quantization": "Q4_K_M", "weights_gb": 4.373, "concurrency_users": 1, "output_throughput_tok_s": 34.95, "per_user_tok_s": 37.69, "ttft_p50_ms": 278.1, "ttft_p90_ms": 284.5, "tpot_p50_ms": 26.5, "gpu_clock_mhz": 653.7, "measured_date": "2026-11-06"}, {"run_id": "e9d31003acf1", "hardware_gpu": "Tesla T4", "gpu_count": 2, "total_vram_gb": 30.0, "hardware_cpu": "Intel(R) Xeon(R) CPU @ 2.00GHz", "operating_system": "Linux 6.18.55+", "serving_engine": "Ollama", "engine_version": "0.40.15", "model_name": "mistral:7b", "parameters": "7.2B", "quantization": "Q4_K_M", "weights_gb": 4.373, "concurrency_users": 2, "output_throughput_tok_s": 28.94, "per_user_tok_s": 30.79, "ttft_p50_ms": 4700.3, "ttft_p90_ms": 4952.1, "tpot_p50_ms": 32.5, "gpu_clock_mhz": 653.7, "measured_date": "2026-11-06"}, {"run_id": "e9d31003acf1", "hardware_gpu": "Tesla T4", "gpu_count": 2, "total_vram_gb": 30.0, "hardware_cpu": "Intel(R) Xeon(R) CPU @ 2.00GHz", "operating_system": "Linux 6.18.55+", "serving_engine": "Ollama", "engine_version": "0.40.15", "model_name": "mistral:7b", "parameters": "7.2B", "quantization": "Q4_K_M", "weights_gb": 4.373, "concurrency_users": 4, "output_throughput_tok_s": 29.29, "per_user_tok_s": 31.1, "ttft_p50_ms": 13258.8, "ttft_p90_ms": 13637.2, "tpot_p50_ms": 32.2, "gpu_clock_mhz": 653.7, "measured_date": "2026-11-06"}, {"run_id": "eab046eff257", "hardware_gpu": "NVIDIA GeForce RTX 3050 6GB Laptop GPU", "gpu_count": 1, "total_vram_gb": 6.0, "hardware_cpu": "AMD Ryzen 5 6600H with Radeon Graphics", "operating_system": "Windows 11", "serving_engine": "Ollama", "engine_version": "0.35.1", "model_name": "qwen2.5-coder:3b", "parameters": "3.1B", "quantization": "Q4_K_M", "weights_gb": 1.93, "concurrency_users": 1, "output_throughput_tok_s": 53.06, "per_user_tok_s": 55.99, "ttft_p50_ms": 141.7, "ttft_p90_ms": 145.5, "tpot_p50_ms": 17.9, "gpu_clock_mhz": 1554.5, "measured_date": "2026-11-06"}, {"run_id": "eab046eff257", "hardware_gpu": "NVIDIA GeForce RTX 3050 6GB Laptop GPU", "gpu_count": 1, "total_vram_gb": 6.0, "hardware_cpu": "AMD Ryzen 5 6600H with Radeon Graphics", "operating_system": "Windows 11", "serving_engine": "Ollama", "engine_version": "0.35.1", "model_name": "qwen2.5-coder:3b", "parameters": "3.1B", "quantization": "Q4_K_M", "weights_gb": 1.93, "concurrency_users": 2, "output_throughput_tok_s": 93.48, "per_user_tok_s": 51.23, "ttft_p50_ms": 258.9, "ttft_p90_ms": 275.0, "tpot_p50_ms": 19.5, "gpu_clock_mhz": 1554.5, "measured_date": "2026-11-06"}, {"run_id": "eab046eff257", "hardware_gpu": "NVIDIA GeForce RTX 3050 6GB Laptop GPU", "gpu_count": 1, "total_vram_gb": 6.0, "hardware_cpu": "AMD Ryzen 5 6600H with Radeon Graphics", "operating_system": "Windows 11", "serving_engine": "Ollama", "engine_version": "0.35.1", "model_name": "qwen2.5-coder:3b", "parameters": "3.1B", "quantization": "Q4_K_M", "weights_gb": 1.93, "concurrency_users": 4, "output_throughput_tok_s": 147.2, "per_user_tok_s": 42.77, "ttft_p50_ms": 488.9, "ttft_p90_ms": 536.0, "tpot_p50_ms": 23.4, "gpu_clock_mhz": 1554.5, "measured_date": "2026-11-06"}, {"run_id": "f4c363077f7e", "hardware_gpu": "NVIDIA GeForce RTX 3050 6GB Laptop GPU", "gpu_count": 1, "total_vram_gb": 6.0, "hardware_cpu": "AMD Ryzen 5 6600H with Radeon Graphics", "operating_system": "Windows 11", "serving_engine": "Ollama", "engine_version": "0.35.1", "model_name": "qwen2.5:0.5b", "parameters": "494.03M", "quantization": "Q4_K_M", "weights_gb": 0.398, "concurrency_users": 1, "output_throughput_tok_s": 189.63, "per_user_tok_s": 201.64, "ttft_p50_ms": 44.5, "ttft_p90_ms": 45.4, "tpot_p50_ms": 5.0, "gpu_clock_mhz": 1650.1, "measured_date": "2026-11-06"}, {"run_id": "f4c363077f7e", "hardware_gpu": "NVIDIA GeForce RTX 3050 6GB Laptop GPU", "gpu_count": 1, "total_vram_gb": 6.0, "hardware_cpu": "AMD Ryzen 5 6600H with Radeon Graphics", "operating_system": "Windows 11", "serving_engine": "Ollama", "engine_version": "0.35.1", "model_name": "qwen2.5:0.5b", "parameters": "494.03M", "quantization": "Q4_K_M", "weights_gb": 0.398, "concurrency_users": 2, "output_throughput_tok_s": 310.37, "per_user_tok_s": 178.12, "ttft_p50_ms": 70.4, "ttft_p90_ms": 77.0, "tpot_p50_ms": 5.6, "gpu_clock_mhz": 1650.1, "measured_date": "2026-11-06"}, {"run_id": "f4c363077f7e", "hardware_gpu": "NVIDIA GeForce RTX 3050 6GB Laptop GPU", "gpu_count": 1, "total_vram_gb": 6.0, "hardware_cpu": "AMD Ryzen 5 6600H with Radeon Graphics", "operating_system": "Windows 11", "serving_engine": "Ollama", "engine_version": "0.35.1", "model_name": "qwen2.5:0.5b", "parameters": "494.03M", "quantization": "Q4_K_M", "weights_gb": 0.398, "concurrency_users": 4, "output_throughput_tok_s": 416.65, "per_user_tok_s": 119.8, "ttft_p50_ms": 83.5, "ttft_p90_ms": 141.0, "tpot_p50_ms": 8.3, "gpu_clock_mhz": 1650.1, "measured_date": "2026-11-06"}];
+    const SCALING_DATA = [{"concurrency": 1, "hardware": "NVIDIA GeForce RTX 3050 6GB Laptop GPU", "model": "qwen2.5:0.5b", "output_throughput_tok_s": 188.9, "input_throughput_tok_s": 455.7, "ttft_p50_ms": 42.9, "ttft_p90_ms": 44.8, "ttft_p99_ms": 64.9, "tpot_p50_ms": 4.9, "tpot_p99_ms": 5.3, "itl_p50_ms": 4.9, "itl_p99_ms": 7.3, "e2e_p50_ms": 663.7, "slo_attainment_pct": 100.0}, {"concurrency": 2, "hardware": "NVIDIA GeForce RTX 3050 6GB Laptop GPU", "model": "qwen2.5:0.5b", "output_throughput_tok_s": 314.9, "input_throughput_tok_s": 744.4, "ttft_p50_ms": 57.3, "ttft_p90_ms": 74.9, "ttft_p99_ms": 80.5, "tpot_p50_ms": 5.9, "tpot_p99_ms": 6.2, "itl_p50_ms": 5.5, "itl_p99_ms": 11.0, "e2e_p50_ms": 805.2, "slo_attainment_pct": 100.0}, {"concurrency": 4, "hardware": "NVIDIA GeForce RTX 3050 6GB Laptop GPU", "model": "qwen2.5:0.5b", "output_throughput_tok_s": 361.3, "input_throughput_tok_s": 855.4, "ttft_p50_ms": 115.4, "ttft_p90_ms": 137.2, "ttft_p99_ms": 161.0, "tpot_p50_ms": 7.3, "tpot_p99_ms": 16.7, "itl_p50_ms": 6.8, "itl_p99_ms": 19.2, "e2e_p50_ms": 1037.9, "slo_attainment_pct": 100.0}, {"concurrency": 5, "hardware": "NVIDIA GeForce RTX 3050 6GB Laptop GPU", "model": "qwen2.5:0.5b", "output_throughput_tok_s": 431.1, "input_throughput_tok_s": 1023.8, "ttft_p50_ms": 111.3, "ttft_p90_ms": 958.1, "ttft_p99_ms": 1147.0, "tpot_p50_ms": 7.3, "tpot_p99_ms": 10.6, "itl_p50_ms": 7.2, "itl_p99_ms": 17.7, "e2e_p50_ms": 1045.7, "slo_attainment_pct": 81.2}, {"concurrency": 6, "hardware": "NVIDIA GeForce RTX 3050 6GB Laptop GPU", "model": "qwen2.5:0.5b", "output_throughput_tok_s": 503.2, "input_throughput_tok_s": 1124.4, "ttft_p50_ms": 116.0, "ttft_p90_ms": 1126.4, "ttft_p99_ms": 1133.4, "tpot_p50_ms": 7.2, "tpot_p99_ms": 7.2, "itl_p50_ms": 7.1, "itl_p99_ms": 9.6, "e2e_p50_ms": 1029.5, "slo_attainment_pct": 62.5}, {"concurrency": 8, "hardware": "NVIDIA GeForce RTX 3050 6GB Laptop GPU", "model": "qwen2.5:0.5b", "output_throughput_tok_s": 436.4, "input_throughput_tok_s": 1038.5, "ttft_p50_ms": 1101.6, "ttft_p90_ms": 1138.1, "ttft_p99_ms": 1141.3, "tpot_p50_ms": 7.2, "tpot_p99_ms": 9.7, "itl_p50_ms": 6.8, "itl_p99_ms": 15.6, "e2e_p50_ms": 2030.5, "slo_attainment_pct": 25.0}];
+
+    let currentGpuFilter = 'all';
+
+    function switchTab(tabId) {
+      document.querySelectorAll('.tab-btn').forEach(b => b.classList.remove('active'));
+      document.querySelectorAll('.tab-content').forEach(c => c.classList.remove('active'));
+
+      event.currentTarget.classList.add('active');
+      document.getElementById('tab-' + tabId).classList.add('active');
+
+      if (tabId === 'scaling') {
+        renderScalingPlot();
+      }
+    }
+
+    function filterGPU(gpu) {
+      currentGpuFilter = gpu;
+      document.querySelectorAll('#tab-explorer .control-group button').forEach(b => {
+        b.classList.toggle('active', (gpu === 'all' && b.innerText.includes('All')) || (gpu !== 'all' && b.innerText.includes(gpu)));
+      });
+      renderBenchTable();
+    }
+
+    function renderBenchTable() {
+      const tbody = document.getElementById('bench-tbody');
+      tbody.innerHTML = '';
+
+      const filtered = BENCH_DATA.filter(d => {
+        if (currentGpuFilter === 'Tesla T4') return d.hardware_gpu.includes('T4');
+        if (currentGpuFilter === 'RTX 3050') return d.hardware_gpu.includes('3050');
+        return true;
+      });
+
+      filtered.forEach(d => {
+        const isT4 = d.hardware_gpu.includes('T4');
+        const badgeClass = isT4 ? 'badge-t4' : 'badge-rtx';
+
+        const tr = document.createElement('tr');
+        tr.innerHTML = `
+          <td style="font-family:var(--font-mono); color:var(--text-muted);">${d.run_id}</td>
+          <td>
+            <strong>${d.hardware_gpu}</strong>
+            <span class="badge ${badgeClass}" style="margin-left:6px;">${isT4 ? '2x GPU' : 'Laptop'}</span>
+          </td>
+          <td style="font-family:var(--font-mono);">${d.total_vram_gb} GB</td>
+          <td>${d.serving_engine} v${d.engine_version}</td>
+          <td style="font-family:var(--font-mono); font-weight:600;">${d.model_name}</td>
+          <td style="font-family:var(--font-mono);">${d.quantization}</td>
+          <td style="font-family:var(--font-mono); text-align:center;">${d.concurrency_users}</td>
+          <td style="font-family:var(--font-mono); font-weight:700; color:var(--accent);">${d.output_throughput_tok_s.toFixed(1)}</td>
+          <td style="font-family:var(--font-mono);">${d.ttft_p50_ms.toFixed(1)}</td>
+          <td style="font-family:var(--font-mono);">${d.tpot_p50_ms.toFixed(1)}</td>
+        `;
+        tbody.appendChild(tr);
+      });
+    }
+
+    function renderScalingPlot() {
+      const svg = document.getElementById('scaling-svg');
+      const box = document.getElementById('chart-box');
+      const w = box.clientWidth || 900;
+      const h = box.clientHeight || 420;
+      svg.setAttribute('viewBox', `0 0 ${w} ${h}`);
+      svg.innerHTML = '';
+
+      const padL = 70;
+      const padR = 40;
+      const padT = 30;
+      const padB = 50;
+      const plotW = w - padL - padR;
+      const plotH = h - padT - padB;
+
+      const maxC = 8;
+      const maxTok = 220;
+
+      const scaleX = c => padL + ((c - 1) / (maxC - 1)) * plotW;
+      const scaleY = t => padT + plotH - (t / maxTok) * plotH;
+
+      // Axis line
+      const axisG = document.createElementNS('http://www.w3.org/2000/svg', 'g');
+      axisG.setAttribute('stroke', '#1f293d');
+      axisG.setAttribute('stroke-width', '1');
+
+      for (let i = 0; i <= 4; i++) {
+        const tok = (i / 4) * maxTok;
+        const yPos = scaleY(tok);
+        const line = document.createElementNS('http://www.w3.org/2000/svg', 'line');
+        line.setAttribute('x1', padL);
+        line.setAttribute('x2', padL + plotW);
+        line.setAttribute('y1', yPos);
+        line.setAttribute('y2', yPos);
+        axisG.appendChild(line);
+
+        const txt = document.createElementNS('http://www.w3.org/2000/svg', 'text');
+        txt.setAttribute('x', padL - 10);
+        txt.setAttribute('y', yPos + 4);
+        txt.setAttribute('fill', '#64748b');
+        txt.setAttribute('font-size', '11');
+        txt.setAttribute('font-family', 'JetBrains Mono');
+        txt.setAttribute('text-anchor', 'end');
+        txt.textContent = tok.toFixed(0);
+        svg.appendChild(txt);
+      }
+
+      // Concurrency ticks
+      SCALING_DATA.forEach(d => {
+        const xPos = scaleX(d.concurrency);
+        const line = document.createElementNS('http://www.w3.org/2000/svg', 'line');
+        line.setAttribute('x1', xPos);
+        line.setAttribute('x2', xPos);
+        line.setAttribute('y1', padT);
+        line.setAttribute('y2', padT + plotH);
+        axisG.appendChild(line);
+
+        const txt = document.createElementNS('http://www.w3.org/2000/svg', 'text');
+        txt.setAttribute('x', xPos);
+        txt.setAttribute('y', padT + plotH + 20);
+        txt.setAttribute('fill', '#64748b');
+        txt.setAttribute('font-size', '11');
+        txt.setAttribute('font-family', 'JetBrains Mono');
+        txt.setAttribute('text-anchor', 'middle');
+        txt.textContent = 'c=' + d.concurrency;
+        svg.appendChild(txt);
+      });
+      svg.appendChild(axisG);
+
+      // Line path
+      let pathD = `M ${scaleX(SCALING_DATA[0].concurrency)} ${scaleY(SCALING_DATA[0].output_throughput_tok_s)}`;
+      for (let i = 1; i < SCALING_DATA.length; i++) {
+        pathD += ` L ${scaleX(SCALING_DATA[i].concurrency)} ${scaleY(SCALING_DATA[i].output_throughput_tok_s)}`;
+      }
+
+      const path = document.createElementNS('http://www.w3.org/2000/svg', 'path');
+      path.setAttribute('d', pathD);
+      path.setAttribute('fill', 'none');
+      path.setAttribute('stroke', '#10b981');
+      path.setAttribute('stroke-width', '3');
+      svg.appendChild(path);
+
+      // Dots
+      SCALING_DATA.forEach(d => {
+        const cx = scaleX(d.concurrency);
+        const cy = scaleY(d.output_throughput_tok_s);
+
+        const circle = document.createElementNS('http://www.w3.org/2000/svg', 'circle');
+        circle.setAttribute('cx', cx);
+        circle.setAttribute('cy', cy);
+        circle.setAttribute('r', '6');
+        circle.setAttribute('fill', '#10b981');
+        circle.setAttribute('stroke', '#0b0f19');
+        circle.setAttribute('stroke-width', '2');
+        svg.appendChild(circle);
+
+        const label = document.createElementNS('http://www.w3.org/2000/svg', 'text');
+        label.setAttribute('x', cx);
+        label.setAttribute('y', cy - 12);
+        label.setAttribute('fill', '#fff');
+        label.setAttribute('font-size', '11');
+        label.setAttribute('font-family', 'JetBrains Mono');
+        label.setAttribute('font-weight', '700');
+        label.setAttribute('text-anchor', 'middle');
+        label.textContent = d.output_throughput_tok_s.toFixed(1) + ' tok/s';
+        svg.appendChild(label);
+      });
+    }
+
+    function renderScalingTable() {
+      const tbody = document.getElementById('scaling-tbody');
+      tbody.innerHTML = '';
+
+      SCALING_DATA.forEach(d => {
+        const tr = document.createElement('tr');
+        tr.innerHTML = `
+          <td style="font-family:var(--font-mono); font-weight:700; color:var(--cyan);">${d.concurrency}</td>
+          <td style="font-family:var(--font-mono); font-weight:700; color:var(--accent);">${d.output_throughput_tok_s.toFixed(1)}</td>
+          <td style="font-family:var(--font-mono);">${d.input_throughput_tok_s.toFixed(1)}</td>
+          <td style="font-family:var(--font-mono);">${d.ttft_p50_ms.toFixed(1)}</td>
+          <td style="font-family:var(--font-mono);">${d.ttft_p99_ms.toFixed(1)}</td>
+          <td style="font-family:var(--font-mono);">${d.tpot_p50_ms.toFixed(1)}</td>
+          <td style="font-family:var(--font-mono);">${d.e2e_p50_ms.toFixed(1)}</td>
+          <td style="font-family:var(--font-mono); color:var(--accent);">${d.slo_attainment_pct.toFixed(0)}%</td>
+        `;
+        tbody.appendChild(tr);
+      });
+    }
+
+    function copyCode(btn) {
+      const text = btn.parentElement.innerText.replace('Copy', '').trim();
+      navigator.clipboard.writeText(text);
+      btn.textContent = '✓ Copied';
+      setTimeout(() => {
+        btn.textContent = 'Copy';
+      }, 2000);
+    }
+
+    window.addEventListener('DOMContentLoaded', () => {
+      renderBenchTable();
+      renderScalingTable();
+      renderScalingPlot();
+      window.addEventListener('resize', renderScalingPlot);
+    });
+  </script>
+</body>
+</html>
