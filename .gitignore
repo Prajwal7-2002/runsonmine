@@ -5,5 +5,6 @@ __pycache__/
 .ruff_cache/
 dist/
 site/
+hf_dataset/
 # result files waiting to be checked with `runsonmine add`
 incoming/

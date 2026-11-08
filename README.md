@@ -9,6 +9,7 @@ speeds (not estimates) from people's own laptops, desktops and Macs, so you can 
 well on yours before you download a model or buy hardware.
 
 [![CI](https://github.com/Prajwal7-2002/runsonmine/actions/workflows/ci.yml/badge.svg)](https://github.com/Prajwal7-2002/runsonmine/actions/workflows/ci.yml)
+[![HuggingFace Dataset](https://img.shields.io/badge/🤗_HuggingFace-consumer--silicon--benchmarks-yellow)](https://huggingface.co/datasets/prajwalpujari16/consumer-silicon-benchmarks)
 [![Code: Apache 2.0](https://img.shields.io/badge/code-Apache%202.0-blue.svg)](LICENSE)
 [![Data: CC BY 4.0](https://img.shields.io/badge/data-CC%20BY%204.0-green.svg)](data/LICENSE.md)
 
