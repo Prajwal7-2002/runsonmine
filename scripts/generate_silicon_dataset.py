@@ -144,6 +144,16 @@ tags:
 - evaluation
 - memory-bandwidth
 pretty_name: "Consumer Silicon LLM Serving Benchmarks (RTX, Tesla T4, Apple Silicon)"
+configs:
+- config_name: consumer_silicon_benchmarks
+  data_files:
+  - split: train
+    path: consumer_silicon_benchmarks.json
+  default: true
+- config_name: concurrency_scaling_curves
+  data_files:
+  - split: train
+    path: concurrency_scaling_curves.json
 ---
 
 # 💻 Consumer Silicon LLM Serving Benchmarks (RTX, Tesla T4, Apple Silicon)
