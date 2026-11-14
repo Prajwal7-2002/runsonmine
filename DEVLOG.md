@@ -53,3 +53,16 @@ First cloud results (Kaggle "GPU T4 x2", Ollama 0.40.15) exposed two problems:
 - Notebook bug: `!` lines in Jupyter substitute `{var}` only if the whole line parses; a grep pattern
   containing braces made `{model}` go through literally (servebench asked Ollama for "{model}"). The
   models cell is now plain Python (subprocess), restarts Ollama if it stops, and keeps errors visible.
+
+## 2026-11-14: v0.3.1 - Native dataset builder, expanded GPU bandwidths, servebench 1-click upload
+
+- `runsonmine build-dataset`: native CLI command and module `runsonmine.dataset` extracting verified
+  runs from `data/results/` into Hugging Face CSV and JSON tables (`hf_dataset/consumer_silicon_benchmarks.csv`
+  and `concurrency_scaling_curves.csv`).
+- Expanded GPU bandwidths (`src/runsonmine/gpus.py`): added RTX 4070/4070 Ti Super, RTX 3060/3070/3080 Ti,
+  RTX 20-series, GTX 1660 series, AMD Radeon RX 7000/6000 series (RX 7900 XTX 960 GB/s to RX 6600 224 GB/s),
+  Intel Arc (A770 560 GB/s down to A380), and Snapdragon X Elite (136 GB/s) to prevent false unknown-GPU flags.
+- `servebench submit --upload`: integrated 1-click submission flag uploading directly to the RunsOnMine
+  FastAPI Space endpoint with PR link display, duplicate handling, and physics rejection feedback.
+- 26 tests passing in runsonmine; 12 submit tests passing in servebench.
+
