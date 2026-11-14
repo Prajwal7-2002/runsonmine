@@ -8,6 +8,7 @@ import shutil
 import sys
 from pathlib import Path
 
+from .dataset import build_dataset
 from .site import build
 from .validate import check_file, content_id
 
@@ -57,11 +58,23 @@ def main(argv: list[str] | None = None) -> int:
     p = sub.add_parser("build-site", help="build the static site")
     p.add_argument("--results-dir", type=Path, default=ROOT / "data" / "results")
     p.add_argument("--out", type=Path, default=ROOT / "site")
+    p = sub.add_parser("build-dataset", help="extract benchmarks to CSV and JSON datasets")
+    p.add_argument("--results-dir", type=Path, default=ROOT / "data" / "results")
+    p.add_argument("--out", type=Path, default=ROOT / "hf_dataset")
+    p.add_argument(
+        "--scaling-file",
+        type=Path,
+        default=ROOT.parent / "servebench" / "results" / "quick-ollama-np4.json",
+    )
     args = ap.parse_args(argv)
     if args.cmd == "validate":
         return _validate(args.paths)
     if args.cmd == "add":
         return _add(args.file, args.results_dir)
+    if args.cmd == "build-dataset":
+        n_master, n_scaling = build_dataset(args.results_dir, args.out, args.scaling_file)
+        print(f"built dataset in {args.out} ({n_master} benchmark rows, {n_scaling} scaling rows)")
+        return 0
     n = build(args.results_dir, args.out)
     print(f"built {args.out / 'index.html'} with {n} results")
     return 0

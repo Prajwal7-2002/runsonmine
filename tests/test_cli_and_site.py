@@ -38,3 +38,25 @@ def test_site_escapes_html(result, tmp_path):
     main(["build-site", "--results-dir", str(d), "--out", str(tmp_path / "site")])
     page = (tmp_path / "site" / "index.html").read_text(encoding="utf-8")
     assert "<script>" not in page and "&lt;script&gt;" in page
+
+
+def test_build_dataset_cli(result, tmp_path):
+    results_dir = tmp_path / "data" / "results"
+    results_dir.mkdir(parents=True)
+    from runsonmine.validate import content_id
+
+    (results_dir / f"{content_id(result)}.json").write_text(json.dumps(result), encoding="utf-8")
+    out = tmp_path / "dataset"
+    assert main(["build-dataset", "--results-dir", str(results_dir), "--out", str(out)]) == 0
+    assert (out / "consumer_silicon_benchmarks.csv").exists()
+    assert (out / "consumer_silicon_benchmarks.json").exists()
+    assert (out / "README.md").exists()
+
+
+def test_peak_bandwidth_expanded_gpus():
+    from runsonmine.gpus import peak_bandwidth
+
+    assert peak_bandwidth("NVIDIA GeForce RTX 4070 Ti SUPER") == 672.0
+    assert peak_bandwidth("AMD Radeon RX 7900 XTX") == 960.0
+    assert peak_bandwidth("Intel Arc A770 Graphics") == 560.0
+    assert peak_bandwidth("Snapdragon X Elite") == 136.0
