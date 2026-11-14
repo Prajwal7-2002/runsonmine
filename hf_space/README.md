@@ -31,3 +31,21 @@ Interactive consumer GPU LLM serving benchmarks and crowdsourced empirical measu
 * **GitHub Repository:** [Prajwal7-2002/runsonmine](https://github.com/Prajwal7-2002/runsonmine)
 * **Dataset:** [prajwalpujari16/consumer-silicon-benchmarks](https://huggingface.co/datasets/prajwalpujari16/consumer-silicon-benchmarks)
 * **Author:** Prajwal Pujari ([@Prajwal7-2002](https://github.com/Prajwal7-2002))
+
+---
+
+### Citation & Attribution
+
+If you use RunsOnMine or its empirical consumer silicon benchmark dataset in your research, product evaluation, or blog, please cite:
+
+```bibtex
+@misc{pujari2024runsonmine,
+  author = {Pujari, Prajwal},
+  title = {RunsOnMine: Empirical Consumer Silicon LLM Serving Benchmark Registry},
+  year = {2024},
+  publisher = {Hugging Face},
+  howpublished = {\url{https://huggingface.co/spaces/prajwalpujari16/runsonmine}},
+  url = {https://github.com/Prajwal7-2002/runsonmine}
+}
+```
+
