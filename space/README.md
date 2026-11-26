@@ -10,10 +10,11 @@ license: apache-2.0
 short_description: Receives servebench results and opens a GitHub PR.
 ---
 
-# RunsOnMine upload service
+# RunsOnMine upload service (inactive draft)
 
-Receives a result from `servebench submit --upload`, validates it with the same checks as CI, and
-opens a pull request on https://github.com/Prajwal7-2002/runsonmine. Nothing is stored here.
+Not deployed (Hugging Face Docker Spaces require a paid subscription). When deployed, receives a
+result payload, validates it with the same checks as CI, and opens a pull request on
+https://github.com/Prajwal7-2002/runsonmine. Nothing is stored here.
 
 Space secrets: `GITHUB_TOKEN` (fine-grained, RunsOnMine repo only: Contents and Pull requests
 read/write). Optional variable: `RUNSONMINE_REPO`.

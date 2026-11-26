@@ -60,8 +60,6 @@ Pick one:
 - **No GitHub account:** send the file to the maintainer (it is safe to share; open it in a text
   editor to see exactly what is in it).
 
-A one-command upload is coming.
-
 ## Notes per platform
 
 - **Mac (Apple Silicon):** the GPU shares the Mac's memory, so your RAM is the limit. GPU clock and
