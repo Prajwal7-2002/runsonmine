@@ -9,13 +9,14 @@ from collections import defaultdict
 from pathlib import Path
 
 from .validate import check
+from .will_it_run import build_lookup
 
 CSS = """
 :root { --bg:#fbfbfa; --fg:#1c1c1a; --muted:#6b6b66; --line:#e3e2de; --accent:#2f6f4f;
-        --flag:#9a5b00; --card:#ffffff; }
+        --flag:#9a5b00; --warn:#a13525; --card:#ffffff; }
 @media (prefers-color-scheme: dark) {
   :root { --bg:#141414; --fg:#ececea; --muted:#a3a39e; --line:#2c2c2a; --accent:#7cc39c;
-          --flag:#e0a24a; --card:#1b1b1a; } }
+          --flag:#e0a24a; --warn:#f08474; --card:#1b1b1a; } }
 * { box-sizing:border-box; }
 body { margin:0; background:var(--bg); color:var(--fg);
        font:15px/1.55 system-ui,-apple-system,"Segoe UI",Roboto,sans-serif; }
@@ -33,6 +34,33 @@ tr:last-child td { border-bottom:0; }
 .sub { color:var(--muted); font-size:12px; }
 a { color:var(--accent); }
 nav a { margin-right:12px; }
+.top-nav { display:flex; gap:16px; margin-bottom:20px; padding-bottom:12px;
+           border-bottom:1px solid var(--line); flex-wrap:wrap; }
+.top-nav a { font-weight:600; text-decoration:none; }
+.controls { display:grid; grid-template-columns:repeat(3, minmax(0, 1fr));
+            gap:12px; margin:20px 0; }
+@media (max-width:720px) { .controls { grid-template-columns:1fr; } }
+.field { display:flex; flex-direction:column; gap:6px; }
+.field label { font-size:13px; font-weight:600; color:var(--muted); }
+.field select { padding:9px 10px; border:1px solid var(--line); border-radius:6px;
+                background:var(--card); color:var(--fg); font:inherit; width:100%; }
+.result-card { border:1px solid var(--line); border-radius:8px; background:var(--card);
+               padding:20px; }
+.pill { display:inline-block; padding:2px 9px; border-radius:999px; font-size:12px;
+        font-weight:600; border:1px solid var(--line); }
+.pill-measured { color:var(--accent); border-color:var(--accent); }
+.pill-predicted { color:var(--flag); border-color:var(--flag); }
+.pill-oom { color:var(--warn); border-color:var(--warn); }
+.metrics { display:grid; grid-template-columns:repeat(auto-fit, minmax(170px, 1fr));
+           gap:14px; margin:16px 0; }
+.metric-k { font-size:12px; color:var(--muted); }
+.metric-v { font-size:22px; font-weight:700; font-variant-numeric:tabular-nums; }
+.cmd-row { display:flex; gap:8px; align-items:center; flex-wrap:wrap; margin-top:12px; }
+.cmd-row code { padding:6px 10px; background:var(--bg); border:1px solid var(--line);
+                border-radius:6px; }
+.btn { padding:6px 12px; border:1px solid var(--line); border-radius:6px; background:var(--bg);
+       color:var(--fg); font:inherit; font-size:13px; cursor:pointer; }
+.btn:active { transform:scale(0.98); }
 footer { margin-top:40px; color:var(--muted); font-size:13px; }
 code { font-size:13px; }
 """
@@ -80,8 +108,314 @@ def _row(rid: str, r: dict, flags: list[str], ceiling: float | None) -> str:
     )
 
 
+def _render_entry_card_html(entry: dict) -> str:
+    status = entry["status"]
+    pill_cls = {
+        "measured": "pill-measured",
+        "predicted": "pill-predicted",
+        "oom": "pill-oom",
+    }.get(status, "")
+    title = (
+        f"{html.escape(entry['model_label'])} ({html.escape(entry['quant'].upper())}) "
+        f"on {html.escape(entry['hardware_label'])}"
+    )
+    pill = f"<span class='pill {pill_cls}'>{html.escape(entry['label'])}</span>"
+
+    if status == "measured":
+        prefill = (
+            f"{entry['prefill_median_tok_s']:,.1f} tok/s"
+            if entry["prefill_median_tok_s"] is not None
+            else "n/a"
+        )
+        d_range = f"{entry['decode_min_tok_s']:,.1f}..{entry['decode_max_tok_s']:,.1f} tok/s"
+        p_range = (
+            f"{entry['prefill_min_tok_s']:,.1f}..{entry['prefill_max_tok_s']:,.1f} tok/s"
+            if entry["prefill_min_tok_s"] is not None
+            else "n/a"
+        )
+        flags_txt = ", ".join(entry["flags"]) if entry["flags"] else "none"
+        body = (
+            "<div class='metrics'>"
+            "<div><div class='metric-k'>Median decode (1 user)</div>"
+            f"<div class='metric-v'>{entry['decode_median_tok_s']:,.1f} tok/s</div>"
+            f"<div class='sub'>Range: {html.escape(d_range)}</div></div>"
+            "<div><div class='metric-k'>Median prefill (effective)</div>"
+            f"<div class='metric-v'>{html.escape(prefill)}</div>"
+            f"<div class='sub'>Range: {html.escape(p_range)} · "
+            f"TTFT p50 {entry['ttft_median_ms']:,.1f} ms</div></div>"
+            "<div><div class='metric-k'>Sample count</div>"
+            f"<div class='metric-v'>{html.escape(entry['label'])}</div></div>"
+            "</div>"
+            f"<p class='sub'>Engine: {html.escape(', '.join(entry['engines']))} · "
+            f"Dates: {html.escape(', '.join(entry['dates']))} · "
+            f"Flags: {html.escape(flags_txt)}</p>"
+        )
+    elif status == "predicted":
+        err = html.escape(entry["error_note"])
+        body = (
+            "<div class='metrics'>"
+            "<div><div class='metric-k'>Predicted decode ceiling</div>"
+            f"<div class='metric-v'>{entry['predicted_decode_ceiling_tok_s']:,.1f} tok/s</div>"
+            f"<div class='sub'>Predicted, not measured ({err})</div></div>"
+            "<div><div class='metric-k'>Predicted memory need (2K ctx)</div>"
+            f"<div class='metric-v'>{entry['predicted_vram_gb']:,.2f} GB</div>"
+            f"<div class='sub'>Device memory: {entry['gpu_vram_gb']:,.1f} GB</div></div>"
+            "</div>"
+            "<p class='sub'>Want real hardware numbers instead of a spec ceiling? "
+            f"<a href='{html.escape(entry['contribute_url'])}'>Measure it yourself</a>:</p>"
+            f"<div class='cmd-row'><code>{html.escape(entry['measure_command'])}</code></div>"
+        )
+    elif status == "oom":
+        body = (
+            "<div class='metrics'>"
+            "<div><div class='metric-k'>Memory check</div>"
+            "<div class='metric-v'>Does not fit</div>"
+            f"<div class='sub'>Short by {entry['oom_deficit_gb']:,.2f} GB on "
+            f"{entry['gpu_vram_gb']:,.1f} GB VRAM</div></div>"
+            "<div><div class='metric-k'>Predicted memory need (2K ctx)</div>"
+            f"<div class='metric-v'>{entry['predicted_vram_gb']:,.2f} GB</div>"
+            f"<div class='sub'>{html.escape(entry['error_note'])}</div></div>"
+            "</div>"
+            "<p class='sub'>Try a smaller quantisation (such as Q4_K_M) or a smaller model.</p>"
+        )
+    else:
+        body = (
+            f"<p>No measurements for this combination yet ({html.escape(entry['error_note'])}).</p>"
+            f"<p class='sub'><a href='{html.escape(entry['contribute_url'])}'>"
+            "Measure it yourself</a>:</p>"
+            f"<div class='cmd-row'><code>{html.escape(entry['measure_command'])}</code></div>"
+        )
+
+    return f"<h2>{title}</h2><p>{pill}</p>{body}"
+
+
+def _summary_row_html(entry: dict) -> str:
+    status = entry["status"]
+    if status == "measured":
+        speed = f"{entry['decode_median_tok_s']:,.1f} tok/s ({html.escape(entry['label'])})"
+        extra = html.escape(", ".join(entry["engines"]) or "-")
+    elif status == "predicted":
+        speed = (
+            f"{entry['predicted_decode_ceiling_tok_s']:,.1f} tok/s ceiling "
+            f"({html.escape(entry['label'])}; {html.escape(entry['error_note'])})"
+        )
+        extra = f"{entry['predicted_vram_gb']:,.2f} GB predicted VRAM"
+    elif status == "oom":
+        speed = html.escape(entry["label"])
+        extra = (
+            f"Needs {entry['predicted_vram_gb']:,.2f} GB (short {entry['oom_deficit_gb']:,.2f} GB)"
+        )
+    else:
+        speed = html.escape(entry["label"])
+        extra = html.escape(entry["error_note"] or "")
+    return (
+        f"<tr data-row-status='{html.escape(status)}'>"
+        f"<td>{html.escape(entry['model_label'])} "
+        f"<span class='sub'>{html.escape(entry['quant'].upper())}</span></td>"
+        f"<td>{html.escape(entry['hardware_label'])}</td>"
+        f"<td>{speed}</td>"
+        f"<td>{extra}</td>"
+        "</tr>"
+    )
+
+
+def _will_it_run_html(lookup: dict) -> str:
+    entries = list(lookup["entries"].values())
+    default_entry = next(
+        (e for e in entries if e["status"] == "measured"),
+        entries[0] if entries else None,
+    )
+    model_opts = "".join(
+        f"<option value='{html.escape(m['id'])}'"
+        f"{' selected' if default_entry and m['id'] == default_entry['model'] else ''}>"
+        f"{html.escape(m['label'])}</option>"
+        for m in lookup["models"]
+    )
+    quant_opts = "".join(
+        f"<option value='{html.escape(q['id'])}'"
+        f"{' selected' if default_entry and q['id'] == default_entry['quant'] else ''}>"
+        f"{html.escape(q['label'])}</option>"
+        for q in lookup["quants"]
+    )
+    hw_opts = "".join(
+        f"<option value='{html.escape(h['id'])}'"
+        f"{' selected' if default_entry and h['id'] == default_entry['hardware'] else ''}>"
+        f"{html.escape(h['label'])}</option>"
+        for h in lookup["hardware"]
+    )
+    initial_card = _render_entry_card_html(default_entry) if default_entry else "<p>No entries.</p>"
+
+    measured_rows = [e for e in entries if e["status"] == "measured"]
+    sample_pred = [e for e in entries if e["status"] == "predicted"][:6]
+    sample_oom = [e for e in entries if e["status"] == "oom"][:4]
+    table_rows = "".join(_summary_row_html(e) for e in (measured_rows + sample_pred + sample_oom))
+
+    safe_json = (
+        json.dumps(lookup).replace("&", "\\u0026").replace("<", "\\u003c").replace(">", "\\u003e")
+    )
+    contribute_href = "https://github.com/Prajwal7-2002/runsonmine/blob/main/docs/contribute.md"
+
+    return f"""<!doctype html>
+<html lang="en"><head><meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Will it run? · RunsOnMine</title>
+<meta name="description"
+  content="Measured local LLM speeds or predicted infersize memory and speed bounds.">
+<style>{CSS}</style></head>
+<body><main>
+<div class="top-nav">
+  <a href="index.html">Measured results</a>
+  <a href="will-it-run.html">Will it run?</a>
+  <a href="{contribute_href}">Measure it yourself</a>
+</div>
+<h1>Will it run?</h1>
+<p class="lead">Pick a model, quantisation, and hardware profile. Shows measured RunsOnMine
+data when available, and otherwise shows an
+<a href="https://github.com/Prajwal7-2002/infersize">infersize</a> ceiling labelled
+<b>Predicted, not measured</b>.</p>
+<div class="controls">
+  <div class="field"><label for="sel-model">Model</label>
+    <select id="sel-model">{model_opts}</select></div>
+  <div class="field"><label for="sel-quant">Quantisation</label>
+    <select id="sel-quant">{quant_opts}</select></div>
+  <div class="field"><label for="sel-hw">GPU, CPU or Mac</label>
+    <select id="sel-hw">{hw_opts}</select></div>
+</div>
+<section class="result-card" id="result-card" aria-live="polite">{initial_card}</section>
+<details style="margin-top:28px;">
+  <summary style="cursor:pointer;color:var(--muted);">
+    Measured results &amp; sample build-time predictions ({len(measured_rows)} measured)
+  </summary>
+  <div class="wrap" style="margin-top:12px;"><table><thead><tr>
+    <th>Model</th><th>Hardware</th><th>Speed &amp; label</th><th>Details</th>
+  </tr></thead><tbody>{table_rows}</tbody></table></div>
+</details>
+<footer>
+  <p>Every value on this page is computed at build time from <a href="results.json">results.json</a>
+  or <code>infersize</code> (predictions use context = {lookup["context_tokens"]} tokens,
+  batch = 1).</p>
+</footer>
+<script id="lookup-data" type="application/json">{safe_json}</script>
+<script>
+(function() {{
+  const data = JSON.parse(document.getElementById("lookup-data").textContent);
+  const selM = document.getElementById("sel-model");
+  const selQ = document.getElementById("sel-quant");
+  const selH = document.getElementById("sel-hw");
+  const card = document.getElementById("result-card");
+  function esc(s) {{
+    return String(s)
+      .replace(/&/g,"&amp;").replace(/</g,"&lt;")
+      .replace(/>/g,"&gt;").replace(/"/g,"&quot;");
+  }}
+  function fmt(x, d) {{
+    if (x == null) return "n/a";
+    return Number(x).toLocaleString(
+      undefined, {{minimumFractionDigits:d, maximumFractionDigits:d}}
+    );
+  }}
+  function pillFor(status) {{
+    if (status === "measured") return "pill-measured";
+    if (status === "predicted") return "pill-predicted";
+    if (status === "oom") return "pill-oom";
+    return "";
+  }}
+  function render() {{
+    const key = selM.value + "|" + selQ.value + "|" + selH.value;
+    const e = data.entries[key];
+    if (!e) {{ card.innerHTML = "<p>No entry found.</p>"; return; }}
+    const url = new URL(window.location);
+    url.searchParams.set("model", selM.value);
+    url.searchParams.set("quant", selQ.value);
+    url.searchParams.set("hw", selH.value);
+    window.history.replaceState(null, "", url);
+    const pillCls = pillFor(e.status);
+    let body = "";
+    if (e.status === "measured") {{
+      const dRange = fmt(e.decode_min_tok_s,1) + ".." + fmt(e.decode_max_tok_s,1) + " tok/s";
+      const pRange = e.prefill_min_tok_s != null
+        ? fmt(e.prefill_min_tok_s,1) + ".." + fmt(e.prefill_max_tok_s,1) + " tok/s"
+        : "n/a";
+      const prefill = e.prefill_median_tok_s != null
+        ? fmt(e.prefill_median_tok_s,1) + " tok/s" : "n/a";
+      const flagsTxt = e.flags.length ? e.flags.join(", ") : "none";
+      body = `<div class="metrics">
+        <div><div class="metric-k">Median decode (1 user)</div>
+        <div class="metric-v">${{fmt(e.decode_median_tok_s,1)}} tok/s</div>
+        <div class="sub">Range: ${{esc(dRange)}}</div></div>
+        <div><div class="metric-k">Median prefill (effective)</div>
+        <div class="metric-v">${{esc(prefill)}}</div>
+        <div class="sub">Range: ${{esc(pRange)}} · TTFT p50 ${{fmt(e.ttft_median_ms,1)}} ms</div>
+        </div>
+        <div><div class="metric-k">Sample count</div>
+        <div class="metric-v">${{esc(e.label)}}</div></div>
+      </div>
+      <p class="sub">Engine: ${{esc(e.engines.join(", "))}} · Dates: ${{esc(e.dates.join(", "))}}
+      · Flags: ${{esc(flagsTxt)}}</p>`;
+    }} else if (e.status === "predicted") {{
+      const cUrl = esc(e.contribute_url);
+      const cmd = esc(e.measure_command);
+      body = `<div class="metrics">
+        <div><div class="metric-k">Predicted decode ceiling</div>
+        <div class="metric-v">${{fmt(e.predicted_decode_ceiling_tok_s,1)}} tok/s</div>
+        <div class="sub">Predicted, not measured (${{esc(e.error_note)}})</div></div>
+        <div><div class="metric-k">Predicted memory need (2K ctx)</div>
+        <div class="metric-v">${{fmt(e.predicted_vram_gb,2)}} GB</div>
+        <div class="sub">Device memory: ${{fmt(e.gpu_vram_gb,1)}} GB</div></div>
+      </div>
+      <p class="sub">Want real hardware numbers? <a href="${{cUrl}}">Measure it yourself</a>:</p>
+      <div class="cmd-row"><code>${{cmd}}</code>
+      <button class="btn" type="button" data-copy="${{cmd}}">Copy</button></div>`;
+    }} else if (e.status === "oom") {{
+      body = `<div class="metrics">
+        <div><div class="metric-k">Memory check</div>
+        <div class="metric-v">Does not fit</div>
+        <div class="sub">Short by ${{fmt(e.oom_deficit_gb,2)}} GB on
+        ${{fmt(e.gpu_vram_gb,1)}} GB VRAM</div></div>
+        <div><div class="metric-k">Predicted memory need (2K ctx)</div>
+        <div class="metric-v">${{fmt(e.predicted_vram_gb,2)}} GB</div>
+        <div class="sub">${{esc(e.error_note)}}</div></div>
+      </div>
+      <p class="sub">Try a smaller quantisation (such as Q4_K_M) or a smaller model.</p>`;
+    }} else {{
+      const cUrl = esc(e.contribute_url);
+      const cmd = esc(e.measure_command);
+      body = `<p>No measurements for this combination yet (${{esc(e.error_note)}}).</p>
+      <p class="sub"><a href="${{cUrl}}">Measure it yourself</a>:</p>
+      <div class="cmd-row"><code>${{cmd}}</code>
+      <button class="btn" type="button" data-copy="${{cmd}}">Copy</button></div>`;
+    }}
+    const heading = `${{esc(e.model_label)}} (${{esc(e.quant.toUpperCase())}}) `
+      + `on ${{esc(e.hardware_label)}}`;
+    card.innerHTML = `<h2>${{heading}}</h2>`
+      + `<p><span class="pill ${{pillCls}}">${{esc(e.label)}}</span></p>${{body}}`;
+    const copyBtn = card.querySelector("[data-copy]");
+    if (copyBtn && navigator.clipboard) {{
+      copyBtn.addEventListener("click", function() {{
+        const val = copyBtn.getAttribute("data-copy");
+        navigator.clipboard.writeText(val).then(function() {{ copyBtn.textContent = "Copied"; }});
+      }});
+    }}
+  }}
+  const p = new URLSearchParams(window.location.search);
+  const pick = (sel, key) => {{
+    if (p.get(key) && [...sel.options].some(o => o.value === p.get(key))) sel.value = p.get(key);
+  }};
+  pick(selM, "model");
+  pick(selQ, "quant");
+  pick(selH, "hw");
+  selM.addEventListener("change", render);
+  selQ.addEventListener("change", render);
+  selH.addEventListener("change", render);
+  render();
+}})();
+</script>
+</main></body></html>
+"""
+
+
 def build(results_dir: Path, out_dir: Path) -> int:
-    """Write index.html, results.json and the raw files to out_dir. Returns result count."""
+    """Write index.html, will-it-run.html, JSON data files, and raw results to out_dir."""
     rows = load_results(results_dir)
     out_dir.mkdir(parents=True, exist_ok=True)
     (out_dir / "results").mkdir(exist_ok=True)
@@ -89,6 +423,10 @@ def build(results_dir: Path, out_dir: Path) -> int:
         shutil.copyfile(results_dir / f"{rid}.json", out_dir / "results" / f"{rid}.json")
     all_results = [{"id": rid, "flags": flags, **r} for rid, r, flags, _ in rows]
     (out_dir / "results.json").write_text(json.dumps(all_results, indent=1), encoding="utf-8")
+
+    lookup = build_lookup(results_dir)
+    (out_dir / "will-it-run.json").write_text(json.dumps(lookup, indent=1), encoding="utf-8")
+    (out_dir / "will-it-run.html").write_text(_will_it_run_html(lookup), encoding="utf-8")
 
     by_gpu: dict[str, list] = defaultdict(list)
     for row in rows:
@@ -120,10 +458,15 @@ def build(results_dir: Path, out_dir: Path) -> int:
 well on your GPU, laptop or Mac.">
 <style>{CSS}</style></head>
 <body><main>
+<div class="top-nav">
+  <a href="index.html">Measured results</a>
+  <a href="will-it-run.html">Will it run?</a>
+  <a href="https://github.com/Prajwal7-2002/runsonmine/blob/main/docs/contribute.md">Contribute</a>
+</div>
 <h1>RunsOnMine</h1>
 <p class="lead">How fast local AI models really run on real computers. Every number here was
 measured on someone's machine with <a href="https://github.com/Prajwal7-2002/servebench">servebench</a>,
-not estimated. {len(rows)} results so far.</p>
+not estimated. {len(rows)} results so far. <a href="will-it-run.html">Check Will it run?</a></p>
 <nav>{nav}</nav>
 {"".join(sections) or "<p>No results yet.</p>"}
 <footer>

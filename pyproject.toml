@@ -12,7 +12,7 @@ license-files = ["LICENSE"]
 requires-python = ">=3.11"
 authors = [{ name = "Prajwal Pujari" }]
 keywords = ["llm", "benchmark", "local-llm", "ollama", "llama.cpp", "gpu", "inference"]
-dependencies = ["jsonschema>=4.21"]
+dependencies = ["jsonschema>=4.21", "infersize>=0.3.3"]
 
 [project.optional-dependencies]
 service = ["fastapi>=0.110", "uvicorn>=0.29"]
