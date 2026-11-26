@@ -9,8 +9,9 @@ using it for the 2-3 minutes the test takes.
 
 ## 1. Install Ollama and a model
 
-Download Ollama from https://ollama.com/download (Mac, Windows or Linux) and open it. Then, in a
-terminal (Mac: Terminal app; Windows: PowerShell):
+Download Ollama from https://ollama.com/download (Mac, Windows or Linux) and open it (or run
+`ollama serve` in a separate terminal on headless Linux, or if `ollama pull` reports `timed out
+waiting for server to start`). Then, in a terminal (Mac: Terminal app; Windows: PowerShell):
 
 ```bash
 ollama pull qwen2.5:0.5b
@@ -54,9 +55,10 @@ way; it finds those too.
 ## 4. Send the result
 
 Pick one:
-- **GitHub:** open a pull request adding the file to
-  [`data/results/`](https://github.com/Prajwal7-2002/runsonmine/tree/main/data/results). CI checks
-  it automatically.
+- **GitHub (no git needed):** open
+  [`data/results/`](https://github.com/Prajwal7-2002/runsonmine/tree/main/data/results), click
+  **Add file -> Upload files**, drop in the JSON file, and select **Create a new branch** to open
+  a pull request. CI checks it automatically.
 - **No GitHub account:** send the file to the maintainer (it is safe to share; open it in a text
   editor to see exactly what is in it).
 
