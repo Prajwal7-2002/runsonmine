@@ -1,0 +1,25 @@
+name: Submit benchmark result
+description: Paste or attach a runsonmine-*.json file from `servebench submit` (no git or PR needed).
+title: "[Result]: <GPU / Mac / CPU> - <model>"
+labels: ["result-submission"]
+body:
+  - type: markdown
+    attributes:
+      value: |
+        Paste the JSON printed by `uvx servebench@latest submit --model qwen2.5:0.5b` (or attach the `runsonmine-*.json` file).
+        It only holds hardware model names, speeds, and power/clock telemetry — no hostnames, usernames, IPs, or prompts.
+  - type: textarea
+    id: result_json
+    attributes:
+      label: Result JSON (or attach file below)
+      description: Paste the full JSON block printed in your terminal, or drag-and-drop the `.json` file into this box.
+      render: json
+    validations:
+      required: true
+  - type: input
+    id: notes
+    attributes:
+      label: Optional notes (laptop model, cooling pad, fan mode)
+      placeholder: e.g. MacBook Air M2 16GB, quiet fan mode
+    validations:
+      required: false
