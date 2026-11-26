@@ -55,10 +55,13 @@ way; it finds those too.
 ## 4. Send the result
 
 Pick one:
-- **GitHub (no git needed):** open
+- **GitHub Issue (easiest, no branching):** open a
+  [Result Submission Issue](https://github.com/Prajwal7-2002/runsonmine/issues/new?template=submit-result.yml)
+  and paste the JSON or drop the file into the form.
+- **GitHub Pull Request (no git CLI needed):** open
   [`data/results/`](https://github.com/Prajwal7-2002/runsonmine/tree/main/data/results), click
-  **Add file -> Upload files**, drop in the JSON file, and select **Create a new branch** to open
-  a pull request. CI checks it automatically.
+  **Add file -> Upload files**, rename or keep the filename unique (or use `runsonmine add` locally),
+  and select **Create a new branch** to open a pull request. CI checks it automatically.
 - **No GitHub account:** send the file to the maintainer (it is safe to share; open it in a text
   editor to see exactly what is in it).
 
@@ -78,7 +81,7 @@ Pick one:
 > 1. Install Ollama (ollama.com), then run: `ollama pull qwen2.5:0.5b`
 > 2. Install uv: Mac `curl -LsSf https://astral.sh/uv/install.sh | sh`, Windows
 >    `powershell -ExecutionPolicy ByPass -c "irm https://astral.sh/uv/install.ps1 | iex"`
-> 3. Plugged in, run: `uvx servebench submit --model qwen2.5:0.5b`
-> 4. Send me the `runsonmine-....json` file it creates.
+> 3. Plugged in, run: `uvx servebench@latest submit --model qwen2.5:0.5b`
+> 4. Send me the `runsonmine-....json` file it creates (or paste it into a [GitHub Issue](https://github.com/Prajwal7-2002/runsonmine/issues/new?template=submit-result.yml)).
 >
 > It only records hardware names and speeds, nothing personal. Thanks!
