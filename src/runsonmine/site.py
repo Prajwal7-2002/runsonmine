@@ -8,6 +8,7 @@ import shutil
 from collections import defaultdict
 from pathlib import Path
 
+from .accuracy import build_accuracy
 from .validate import check
 from .will_it_run import build_lookup
 
@@ -61,6 +62,10 @@ nav a { margin-right:12px; }
 .btn { padding:6px 12px; border:1px solid var(--line); border-radius:6px; background:var(--bg);
        color:var(--fg); font:inherit; font-size:13px; cursor:pointer; }
 .btn:active { transform:scale(0.98); }
+.notice { border:1px solid var(--flag); border-radius:8px; padding:12px 16px;
+          background:var(--card); margin:16px 0 20px; }
+.chart-wrap { border:1px solid var(--line); border-radius:8px; background:var(--card);
+              padding:16px; margin:16px 0 24px; overflow-x:auto; }
 footer { margin-top:40px; color:var(--muted); font-size:13px; }
 code { font-size:13px; }
 """
@@ -156,7 +161,9 @@ def _render_entry_card_html(entry: dict) -> str:
             "<div class='metrics'>"
             "<div><div class='metric-k'>Predicted decode ceiling</div>"
             f"<div class='metric-v'>{entry['predicted_decode_ceiling_tok_s']:,.1f} tok/s</div>"
-            f"<div class='sub'>Predicted, not measured ({err})</div></div>"
+            "<div class='sub'>Predicted, not measured "
+            f"(<a href='{html.escape(entry.get('accuracy_url') or 'accuracy.html')}'>{err}</a>)"
+            "</div></div>"
             "<div><div class='metric-k'>Predicted memory need (2K ctx)</div>"
             f"<div class='metric-v'>{entry['predicted_vram_gb']:,.2f} GB</div>"
             f"<div class='sub'>Device memory: {entry['gpu_vram_gb']:,.1f} GB</div></div>"
@@ -266,6 +273,7 @@ def _will_it_run_html(lookup: dict) -> str:
 <div class="top-nav">
   <a href="index.html">Measured results</a>
   <a href="will-it-run.html">Will it run?</a>
+  <a href="accuracy.html">Prediction accuracy</a>
   <a href="{contribute_href}">Measure it yourself</a>
 </div>
 <h1>Will it run?</h1>
@@ -358,7 +366,9 @@ data when available, and otherwise shows an
       body = `<div class="metrics">
         <div><div class="metric-k">Predicted decode ceiling</div>
         <div class="metric-v">${{fmt(e.predicted_decode_ceiling_tok_s,1)}} tok/s</div>
-        <div class="sub">Predicted, not measured (${{esc(e.error_note)}})</div></div>
+        <div class="sub">Predicted, not measured
+        (<a href="${{esc(e.accuracy_url || "accuracy.html")}}">${{esc(e.error_note)}}</a>)
+        </div></div>
         <div><div class="metric-k">Predicted memory need (2K ctx)</div>
         <div class="metric-v">${{fmt(e.predicted_vram_gb,2)}} GB</div>
         <div class="sub">Device memory: ${{fmt(e.gpu_vram_gb,1)}} GB</div></div>
@@ -414,8 +424,132 @@ data when available, and otherwise shows an
 """
 
 
+def _accuracy_chart_svg(rows: list[dict]) -> str:
+    if not rows:
+        return "<p class='sub'>No rows available to plot yet.</p>"
+    max_val = max(max(r["measured_tok_s"], r["predicted_tok_s"]) for r in rows) or 1.0
+    label_w = 240
+    bar_max = 360
+    row_h = 34
+    top_pad = 28
+    width = 760
+    height = top_pad + len(rows) * row_h + 16
+    bars: list[str] = [
+        f"<text x='{label_w}' y='16' font-size='12' fill='var(--accent)' font-weight='600'>"
+        "Measured tok/s</text>",
+        f"<text x='{label_w + 130}' y='16' font-size='12' fill='var(--flag)' font-weight='600'>"
+        "Predicted ceiling tok/s</text>",
+    ]
+    for i, r in enumerate(rows):
+        y = top_pad + i * row_h
+        mw = max(2.0, (r["measured_tok_s"] / max_val) * bar_max)
+        pw = max(2.0, (r["predicted_tok_s"] / max_val) * bar_max)
+        short_hw = r["hardware"].replace("NVIDIA GeForce ", "").replace("NVIDIA ", "")
+        raw_lbl = f"{r['model']} ({short_hw})"
+        if len(raw_lbl) > 34:
+            raw_lbl = raw_lbl[:31] + "..."
+        lbl = html.escape(raw_lbl)
+        diff = (
+            f"{r['measured_tok_s']:.1f} vs {r['predicted_tok_s']:.1f} "
+            f"({r['signed_error_pct']:+.1f}%)"
+        )
+        bars.append(
+            f"<text x='0' y='{y + 16}' font-size='12' fill='currentColor'>{lbl}</text>"
+            f"<rect x='{label_w}' y='{y + 3}' width='{mw:.1f}' height='10' "
+            "rx='2' fill='var(--accent)'/>"
+            f"<rect x='{label_w}' y='{y + 16}' width='{pw:.1f}' height='10' "
+            "rx='2' fill='var(--flag)' opacity='0.78'/>"
+            f"<text x='{label_w + bar_max + 12}' y='{y + 17}' font-size='11' "
+            f"fill='var(--muted)'>{html.escape(diff)}</text>"
+        )
+    return (
+        f"<svg viewBox='0 0 {width} {height}' width='100%' role='img' "
+        f"aria-label='Measured vs predicted decode speeds'>" + "".join(bars) + "</svg>"
+    )
+
+
+def _accuracy_html(acc: dict) -> str:
+    contribute_href = "https://github.com/Prajwal7-2002/runsonmine/blob/main/docs/contribute.md"
+    med = (
+        f"{acc['median_abs_error_pct']:.1f}%" if acc["median_abs_error_pct"] is not None else "n/a"
+    )
+    err_range = (
+        f"{acc['min_abs_error_pct']:.1f}%..{acc['max_abs_error_pct']:.1f}%"
+        if acc["min_abs_error_pct"] is not None
+        else "n/a"
+    )
+    warn_html = (
+        "<div class='notice'><b>Small sample note:</b> "
+        f"{html.escape(acc['early_sample_warning'])}</div>"
+        if acc["early_sample_warning"]
+        else ""
+    )
+    table_rows = "".join(
+        "<tr>"
+        f"<td>{html.escape(r['model'])} "
+        f"<span class='sub'>{html.escape(r['quant'].upper())}</span></td>"
+        f"<td>{html.escape(r['hardware'])}</td>"
+        f"<td>{html.escape(r['engine'])}</td>"
+        f"<td class='num'>{r['measured_tok_s']:,.1f}</td>"
+        f"<td class='num'>{r['predicted_tok_s']:,.1f}</td>"
+        f"<td class='num'>{r['error_tok_s']:+,.1f}</td>"
+        f"<td class='num'>{r['signed_error_pct']:+.1f}%</td>"
+        f"<td class='num'>{r['abs_error_pct']:.1f}%</td>"
+        f"<td>{html.escape(', '.join(r['flags']) or 'none')}</td>"
+        f"<td>{html.escape(r['date'])}</td>"
+        f"<td><a href='results/{html.escape(r['id'])}.json'>data</a></td>"
+        "</tr>"
+        for r in acc["rows"]
+    )
+    body_table = (
+        "<div class='wrap'><table><thead><tr>"
+        "<th>Model</th><th>Hardware</th><th>Engine</th>"
+        "<th class='num'>Measured tok/s</th><th class='num'>Predicted tok/s</th>"
+        "<th class='num'>Diff tok/s</th><th class='num'>Signed err</th>"
+        "<th class='num'>Abs err</th><th>Flags</th><th>Date</th><th></th>"
+        f"</tr></thead><tbody>{table_rows}</tbody></table></div>"
+        if acc["rows"]
+        else "<p>No matching rows yet.</p>"
+    )
+    return f"""<!doctype html>
+<html lang="en"><head><meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Prediction accuracy · RunsOnMine</title>
+<meta name="description"
+  content="Predicted infersize speed bounds compared against measured RunsOnMine hardware runs.">
+<style>{CSS}</style></head>
+<body><main>
+<div class="top-nav">
+  <a href="index.html">Measured results</a>
+  <a href="will-it-run.html">Will it run?</a>
+  <a href="accuracy.html">Prediction accuracy</a>
+  <a href="{contribute_href}">Measure it yourself</a>
+</div>
+<h1>How accurate are the predictions?</h1>
+<p class="lead">Every measured single-user decode run in RunsOnMine compared against
+<a href="https://github.com/Prajwal7-2002/infersize">infersize</a>'s default ceiling prediction
+(no added per-token overhead). Lower absolute percentage error is closer to real silicon.</p>
+<div class="metrics">
+  <div><div class="metric-k">Median abs error</div><div class="metric-v">{med}</div></div>
+  <div><div class="metric-k">Abs error range</div><div class="metric-v">{err_range}</div></div>
+  <div><div class="metric-k">Rows compared (n)</div><div class="metric-v">{acc["n"]}</div></div>
+  <div><div class="metric-k">GPUs covered</div><div class="metric-v">{acc["gpu_count"]}</div></div>
+</div>
+{warn_html}
+<div class="chart-wrap">{_accuracy_chart_svg(acc["rows"])}</div>
+<h2>Per-row comparison</h2>
+{body_table}
+<footer>
+  <p>Why predictions sit above measured speeds: <code>infersize</code> defaults to
+  <code>decode_overhead_ms = 0</code> and 80% memory-bus efficiency, which ignores per-token
+  runtime dispatch overhead that dominates small models (e.g. 0.5B).</p>
+</footer>
+</main></body></html>
+"""
+
+
 def build(results_dir: Path, out_dir: Path) -> int:
-    """Write index.html, will-it-run.html, JSON data files, and raw results to out_dir."""
+    """Write index.html, will-it-run.html, accuracy.html, JSON data files, and raw results."""
     rows = load_results(results_dir)
     out_dir.mkdir(parents=True, exist_ok=True)
     (out_dir / "results").mkdir(exist_ok=True)
@@ -424,7 +558,11 @@ def build(results_dir: Path, out_dir: Path) -> int:
     all_results = [{"id": rid, "flags": flags, **r} for rid, r, flags, _ in rows]
     (out_dir / "results.json").write_text(json.dumps(all_results, indent=1), encoding="utf-8")
 
-    lookup = build_lookup(results_dir)
+    acc = build_accuracy(results_dir)
+    (out_dir / "accuracy.json").write_text(json.dumps(acc, indent=1), encoding="utf-8")
+    (out_dir / "accuracy.html").write_text(_accuracy_html(acc), encoding="utf-8")
+
+    lookup = build_lookup(results_dir, error_note=acc["summary_label"])
     (out_dir / "will-it-run.json").write_text(json.dumps(lookup, indent=1), encoding="utf-8")
     (out_dir / "will-it-run.html").write_text(_will_it_run_html(lookup), encoding="utf-8")
 
@@ -461,6 +599,7 @@ well on your GPU, laptop or Mac.">
 <div class="top-nav">
   <a href="index.html">Measured results</a>
   <a href="will-it-run.html">Will it run?</a>
+  <a href="accuracy.html">Prediction accuracy</a>
   <a href="https://github.com/Prajwal7-2002/runsonmine/blob/main/docs/contribute.md">Contribute</a>
 </div>
 <h1>RunsOnMine</h1>
