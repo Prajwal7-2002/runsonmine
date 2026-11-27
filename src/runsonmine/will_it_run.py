@@ -173,6 +173,51 @@ def _measured_entry(
     }
 
 
+def predict_single_user(
+    arch: ModelArch | None,
+    gpu: GPUProfile | None,
+    quant_id: str,
+) -> dict | None:
+    """Compute single-user VRAM fit and decode speed ceiling with infersize."""
+    if arch is None or gpu is None:
+        return None
+    try:
+        vram = estimate_vram_usage(
+            arch,
+            gpu,
+            precision=quant_id,
+            kv_cache_dtype="fp16",
+            batch_size=1,
+            context_tokens=CONTEXT_TOKENS,
+        )
+    except ValueError:
+        return None
+
+    if not vram.fits_in_vram:
+        return {
+            "fits": False,
+            "vram": vram,
+            "predicted_tok_s": None,
+            "oom_deficit_gb": round(abs(vram.free_vram_headroom_gb), 2),
+        }
+
+    cost = estimate_serving_cost(
+        arch,
+        gpu,
+        precision=quant_id,
+        kv_cache_dtype="fp16",
+        batch_size=1,
+        context_tokens=CONTEXT_TOKENS,
+        custom_hourly_rate=0.0,
+    )
+    return {
+        "fits": True,
+        "vram": vram,
+        "predicted_tok_s": round(cost.tokens_per_sec_per_user, 1),
+        "oom_deficit_gb": None,
+    }
+
+
 def _predicted_entry(
     model_id: str,
     model_label: str,
@@ -181,6 +226,8 @@ def _predicted_entry(
     hw_label: str,
     arch: ModelArch | None,
     gpu: GPUProfile | None,
+    error_note: str = "error not yet known",
+    accuracy_url: str = "accuracy.html",
 ) -> dict:
     cmd = _measure_command(model_id)
     base = {
@@ -203,8 +250,10 @@ def _predicted_entry(
         "flags": [],
         "measure_command": cmd,
         "contribute_url": CONTRIBUTE_URL,
+        "accuracy_url": accuracy_url,
     }
-    if arch is None or gpu is None:
+    pred = predict_single_user(arch, gpu, quant_id)
+    if pred is None:
         return {
             **base,
             "status": "unknown",
@@ -213,32 +262,11 @@ def _predicted_entry(
             "predicted_vram_gb": None,
             "gpu_vram_gb": gpu.vram_gb if gpu else None,
             "oom_deficit_gb": None,
-            "error_note": "error not yet known",
+            "error_note": error_note,
         }
 
-    try:
-        vram = estimate_vram_usage(
-            arch,
-            gpu,
-            precision=quant_id,
-            kv_cache_dtype="fp16",
-            batch_size=1,
-            context_tokens=CONTEXT_TOKENS,
-        )
-    except ValueError:
-        return {
-            **base,
-            "status": "unknown",
-            "label": "No measurements yet",
-            "predicted_decode_ceiling_tok_s": None,
-            "predicted_vram_gb": None,
-            "gpu_vram_gb": gpu.vram_gb,
-            "oom_deficit_gb": None,
-            "error_note": "error not yet known",
-        }
-
-    if not vram.fits_in_vram:
-        deficit = round(abs(vram.free_vram_headroom_gb), 2)
+    vram = pred["vram"]
+    if not pred["fits"]:
         return {
             **base,
             "status": "oom",
@@ -248,35 +276,31 @@ def _predicted_entry(
             "weight_memory_gb": vram.weight_memory_gb,
             "kv_cache_memory_gb": vram.kv_cache_memory_gb,
             "gpu_vram_gb": vram.gpu_total_vram_gb,
-            "oom_deficit_gb": deficit,
+            "oom_deficit_gb": pred["oom_deficit_gb"],
             "error_note": "predicted memory need (error not yet known)",
         }
 
-    cost = estimate_serving_cost(
-        arch,
-        gpu,
-        precision=quant_id,
-        kv_cache_dtype="fp16",
-        batch_size=1,
-        context_tokens=CONTEXT_TOKENS,
-        custom_hourly_rate=0.0,
-    )
     return {
         **base,
         "status": "predicted",
         "label": "Predicted, not measured",
-        "predicted_decode_ceiling_tok_s": round(cost.tokens_per_sec_per_user, 1),
+        "predicted_decode_ceiling_tok_s": pred["predicted_tok_s"],
         "predicted_vram_gb": vram.total_required_vram_gb,
         "weight_memory_gb": vram.weight_memory_gb,
         "kv_cache_memory_gb": vram.kv_cache_memory_gb,
         "gpu_vram_gb": vram.gpu_total_vram_gb,
         "oom_deficit_gb": None,
-        "error_note": "error not yet known",
+        "error_note": error_note,
     }
 
 
-def build_lookup(results_dir: Path) -> dict:
+def build_lookup(results_dir: Path, error_note: str | None = None) -> dict:
     """Compute the full build-time (model, quant, hardware) table from results and infersize."""
+    if error_note is None:
+        from .accuracy import build_accuracy
+
+        error_note = build_accuracy(results_dir)["summary_label"]
+
     grouped: dict[tuple[str, str, str], list[tuple[dict, list[str]]]] = defaultdict(list)
     model_labels: dict[str, str] = {m: m for m in MODEL_PRESETS}
     quant_ids: list[str] = list(DEFAULT_QUANTS)
@@ -323,6 +347,7 @@ def build_lookup(results_dir: Path) -> dict:
                         hw_label,
                         arch,
                         GPU_PRESETS.get(hw_id),
+                        error_note=error_note,
                     )
 
     return {

@@ -52,6 +52,14 @@ def test_measured_single_and_multiple_results(result, tmp_path):
 
 
 def test_unmeasured_combo_shows_predicted_not_measured(result, tmp_path):
+    empty = tmp_path / "empty"
+    empty.mkdir()
+    empty_lookup = build_lookup(empty)
+    empty_entry = empty_lookup["entries"]["qwen2.5-0.5b|q4_k_m|rtx4090"]
+    assert empty_entry["status"] == "predicted"
+    assert empty_entry["label"] == "Predicted, not measured"
+    assert "error not yet known" in empty_entry["error_note"]
+
     d = tmp_path / "results"
     _write_result(d, result)
 
@@ -59,7 +67,8 @@ def test_unmeasured_combo_shows_predicted_not_measured(result, tmp_path):
     entry = lookup["entries"]["qwen2.5-0.5b|q4_k_m|rtx4090"]
     assert entry["status"] == "predicted"
     assert entry["label"] == "Predicted, not measured"
-    assert "error not yet known" in entry["error_note"]
+    assert "median abs error" in entry["error_note"].lower()
+    assert entry["accuracy_url"] == "accuracy.html"
     assert entry["predicted_decode_ceiling_tok_s"] > 0
     assert entry["predicted_vram_gb"] > 0
     assert "servebench" in entry["measure_command"]
